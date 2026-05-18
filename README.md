@@ -10,9 +10,10 @@ The goal is to provide a shared core scheduling and tracking engine that can be 
 - Support estrogen, testosterone blockers, and future medication categories without hardcoding one fixed regimen.
 - Support different forms and routes, such as tablets, fractional tablets, sublingual use, patches, gels, and injections.
 - Calculate treatment start, taken dose counts, next dose times, and reminder requests from a common core library.
-- Keep storage and notification scheduling platform-specific behind interfaces.
+- Keep storage, notification scheduling, and account sync platform-specific behind interfaces.
 - Build native UI wrappers around the shared core for Android and iOS.
-- Keep web support as a bridge/client target that can use the same core model later.
+- Support local-first mobile usage, with optional Google/Apple account sync later.
+- Keep web support as a bridge/client target that can use the same core model later; web is expected to require login for persistent tracking.
 
 ## Architecture direction
 
@@ -44,6 +45,7 @@ Core responsibilities:
 Platform responsibilities:
 
 - SQLite or other local persistence implementation
+- optional account connection and sync
 - notification/alarm scheduling
 - native UI
 - platform permissions and lifecycle handling
