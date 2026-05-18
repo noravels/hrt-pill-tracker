@@ -54,6 +54,12 @@ Platform responsibilities:
 
 This repository is in the research and architecture phase. Implementation details may change as the core model is refined.
 
+## License
+
+This project is licensed under AGPL-3.0-or-later with an additional app marketplace distribution permission. Personal and commercial use are allowed, including self-hosting and redistribution, provided modified versions remain open source under the same license terms.
+
+See `LICENSE` and `LICENSE-EXCEPTION.md`.
+
 ## Medical disclaimer
 
 This project is a tracking tool only. It does not provide medical advice, dosing recommendations, diagnosis, or treatment guidance. Medication plans should be configured by the user based on their own clinician-approved or personally chosen regimen.
