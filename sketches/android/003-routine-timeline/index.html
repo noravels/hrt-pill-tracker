@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HRT Tracker Android Mockup — Routine Timeline</title>
+  <style>
+    :root {
+      --bg: #f4f1ed;
+      --paper: #fffdf9;
+      --ink: #1f2523;
+      --muted: #68716d;
+      --primary: #556b5f;
+      --primary-dark: #243c33;
+      --soft: #e7eee9;
+      --lav: #ede8f7;
+      --lav-text: #5d4c87;
+      --line: #ded8cf;
+      --amber: #f7ead2;
+      font-family: Inter, Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display:grid; place-items:center; background: linear-gradient(135deg, #e6e1da, #cfdad3); color: var(--ink); }
+    .phone { width: min(100vw, 390px); min-height: 844px; background: var(--bg); position: relative; overflow:hidden; box-shadow: 0 30px 80px rgba(38,44,40,.28); }
+    .status { height: 34px; padding: 10px 22px 0; display:flex; justify-content:space-between; font-size:13px; font-weight:800; }
+    header { padding: 12px 20px 16px; }
+    .meta { display:flex; align-items:center; justify-content:space-between; color: var(--muted); font-size:13px; font-weight:800; }
+    h1 { margin: 12px 0 0; font-size: 31px; line-height: 1.05; letter-spacing: -.05em; }
+    .privacy { margin-top: 14px; border-radius: 18px; padding: 12px 14px; background: rgba(255,253,249,.75); border: 1px solid var(--line); display:flex; gap:10px; align-items:center; color: var(--muted); font-size:13px; }
+    main { padding: 0 18px 108px; }
+    .now { background: var(--primary-dark); color: white; border-radius: 30px; padding: 20px; box-shadow: 0 18px 36px rgba(36,60,51,.22); }
+    .now .label { color: #b8d0c6; font-size: 12px; font-weight:900; text-transform:uppercase; letter-spacing:.1em; }
+    .now-grid { margin-top: 14px; display:grid; grid-template-columns: 1fr auto; gap: 16px; align-items:end; }
+    .now h2 { margin:0; font-size:44px; letter-spacing:-.06em; }
+    .now p { margin: 5px 0 0; color: #dbe8e3; font-size:14px; line-height:1.4; }
+    .round { border:0; width:68px; height:68px; border-radius:24px; background:#ffffff; color:var(--primary-dark); font-weight:1000; box-shadow: 0 10px 20px rgba(0,0,0,.18); }
+    .round.done { background:#dbe8e3; }
+    .timeline { margin-top: 24px; position: relative; }
+    .timeline::before { content:""; position:absolute; left: 25px; top: 12px; bottom: 12px; width:2px; background: var(--line); }
+    .item { position: relative; display:grid; grid-template-columns: 52px 1fr; gap: 12px; margin-bottom: 14px; }
+    .dot { position:relative; z-index:1; width:52px; display:grid; place-items:start center; padding-top: 5px; }
+    .dot span { width:18px; height:18px; border-radius:50%; background: var(--paper); border: 4px solid var(--primary); }
+    .item.done .dot span { background: var(--primary); }
+    .item.optional .dot span { border-color: #8b79b7; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 23px; padding: 15px; }
+    .panel-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    .time { font-size: 13px; font-weight: 950; color: var(--muted); }
+    .panel h3 { margin: 4px 0 4px; font-size:17px; }
+    .panel p { margin:0; color:var(--muted); font-size:13px; line-height:1.38; }
+    .chip { border-radius:999px; padding:7px 9px; font-size:12px; font-weight:900; background:var(--soft); color:var(--primary-dark); white-space:nowrap; }
+    .chip.optional { background:var(--lav); color:var(--lav-text); }
+    .chip.later { background:var(--amber); color:#775525; }
+    .config { margin-top: 18px; background: rgba(255,253,249,.74); border: 1px dashed #cfc7bc; border-radius: 22px; padding: 15px; }
+    .config h3 { margin:0 0 7px; font-size:16px; }
+    .config p { margin:0; color:var(--muted); font-size:13px; line-height:1.45; }
+    .sheet { position:absolute; left:0; right:0; bottom:0; background: var(--paper); border-radius: 30px 30px 0 0; border-top:1px solid var(--line); padding: 10px 20px 22px; transform: translateY(calc(100% - 88px)); transition: .28s ease; box-shadow: 0 -18px 38px rgba(47,42,35,.14); }
+    .sheet.open { transform: translateY(0); }
+    .handle { width:42px; height:5px; border-radius:99px; background:#d1cbc2; margin:0 auto 14px; }
+    .sheet button { width:100%; border:0; border-radius:20px; padding:16px; background:var(--primary-dark); color:white; font-size:15px; font-weight:950; }
+    .sheet h3 { margin: 16px 0 8px; }
+    .sheet p { margin:0 0 12px; color:var(--muted); font-size:14px; line-height:1.45; }
+    .mini-row { display:flex; justify-content:space-between; padding: 12px 0; border-top:1px solid var(--line); font-size:14px; }
+    .mini-row strong { color:var(--primary-dark); }
+  </style>
+</head>
+<body>
+  <div class="phone" role="application" aria-label="HRT tracker routine timeline mockup">
+    <div class="status"><span>9:41</span><span>Wi‑Fi 82%</span></div>
+    <header>
+      <div class="meta"><span>Wednesday</span><span>Local routine</span></div>
+      <h1>Your dose routine</h1>
+      <div class="privacy"><span>🔒</span><span>Phase 1 keeps plan data on this phone. No sign-in required.</span></div>
+    </header>
+    <main>
+      <section class="now">
+        <div class="label">Next in routine</div>
+        <div class="now-grid">
+          <div><h2>8:00 PM</h2><p>Estradiol evening dose. Reminder is enabled locally.</p></div>
+          <button id="done" class="round" aria-label="Mark next dose taken">✓</button>
+        </div>
+      </section>
+
+      <section class="timeline" aria-label="Today's medication timeline">
+        <article class="item done"><div class="dot"><span></span></div><div class="panel"><div class="panel-top"><div><div class="time">8:00 AM</div><h3>Estradiol</h3><p>Morning dose recorded.</p></div><span class="chip">Taken</span></div></div></article>
+        <article class="item"><div class="dot"><span></span></div><div class="panel"><div class="panel-top"><div><div class="time">8:00 PM</div><h3>Estradiol</h3><p>Next scheduled dose.</p></div><span class="chip later">Next</span></div></div></article>
+        <article class="item optional"><div class="dot"><span></span></div><div class="panel"><div class="panel-top"><div><div class="time">9:00 PM</div><h3>T-blocker</h3><p>Optional medication slot; not shown for estrogen-only plans.</p></div><span class="chip optional">Optional</span></div></div></article>
+      </section>
+
+      <section class="config"><h3>Plan flexibility</h3><p>Supports estrogen-only routines, estrogen plus blocker routines, and reminder-only adjustments without requiring cloud sync.</p></section>
+    </main>
+
+    <section id="sheet" class="sheet" aria-live="polite">
+      <div class="handle"></div>
+      <button id="sheetButton">Open reminder details</button>
+      <h3>Reminder details</h3>
+      <p>Notifications are scheduled locally from the active plan. If a dose is marked taken, the next reminder remains unchanged unless the schedule is edited.</p>
+      <div class="mini-row"><span>Estradiol reminders</span><strong>On</strong></div>
+      <div class="mini-row"><span>T-blocker slot</span><strong>Optional</strong></div>
+    </section>
+  </div>
+
+  <script>
+    const done = document.getElementById('done');
+    done.addEventListener('click', () => {
+      done.textContent = 'Done';
+      done.classList.add('done');
+      done.style.fontSize = '13px';
+    });
+
+    const sheet = document.getElementById('sheet');
+    const sheetButton = document.getElementById('sheetButton');
+    sheetButton.addEventListener('click', () => {
+      sheet.classList.toggle('open');
+      sheetButton.textContent = sheet.classList.contains('open') ? 'Close reminder details' : 'Open reminder details';
+    });
+  </script>
+</body>
+</html>

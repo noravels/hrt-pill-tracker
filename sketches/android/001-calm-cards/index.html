@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HRT Tracker Android Mockup — Calm Cards</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef5f2;
+      --surface: #ffffff;
+      --surface-2: #f7fbf9;
+      --primary: #286b5d;
+      --primary-2: #d9eee8;
+      --accent: #6f5fa8;
+      --text: #172522;
+      --muted: #63736f;
+      --line: #d9e5e1;
+      --warn: #8a5a18;
+      --shadow: 0 18px 45px rgba(31, 73, 65, .14);
+      font-family: Inter, Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, #f8fffc 0%, var(--bg) 44%, #e4eeeb 100%);
+      color: var(--text);
+    }
+
+    .phone {
+      width: min(100vw, 390px);
+      min-height: 844px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(35, 63, 58, .25);
+    }
+
+    .status {
+      height: 34px;
+      padding: 10px 22px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    header {
+      padding: 14px 22px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 13px; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -.04em; }
+    .icon-button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.8);
+      height: 42px; width: 42px;
+      border-radius: 14px;
+      display: grid; place-items: center;
+      color: var(--primary);
+      font-size: 20px;
+    }
+
+    main { padding: 0 18px 96px; }
+    .hero-card {
+      background: linear-gradient(145deg, #ffffff, #f3fbf8);
+      border: 1px solid rgba(255,255,255,.86);
+      border-radius: 30px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .label { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .pill {
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: var(--primary-2);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .next-dose { margin: 18px 0 4px; font-size: 42px; line-height: 1; letter-spacing: -.05em; }
+    .subtitle { margin: 0; color: var(--muted); line-height: 1.45; }
+
+    button.primary {
+      margin-top: 22px;
+      width: 100%;
+      border: 0;
+      border-radius: 20px;
+      padding: 17px 18px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 12px 24px rgba(40,107,93,.22);
+    }
+    button.primary.taken { background: #35524b; }
+
+    .section-title { margin: 26px 4px 12px; display:flex; justify-content:space-between; align-items:center; }
+    h2 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+    .link { color: var(--primary); font-size: 13px; font-weight: 800; }
+
+    .stack { display: grid; gap: 12px; }
+    .dose-card {
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+    .med-icon {
+      height: 48px; width: 48px;
+      border-radius: 17px;
+      display: grid; place-items:center;
+      font-weight: 900;
+      color: var(--primary);
+      background: var(--primary-2);
+    }
+    .med-icon.blocker { color: var(--accent); background: #ece8fb; }
+    .dose-card h3 { margin: 0 0 4px; font-size: 16px; }
+    .dose-card p { margin: 0; color: var(--muted); font-size: 13px; }
+    .time { font-weight: 900; color: var(--text); font-size: 14px; }
+    .optional { color: var(--muted); font-weight: 700; font-size: 12px; margin-top: 3px; }
+
+    .reminder {
+      margin-top: 14px;
+      background: #fffaf1;
+      border: 1px solid #f1dfbd;
+      border-radius: 22px;
+      padding: 15px 16px;
+      color: var(--warn);
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    nav {
+      position: absolute;
+      left: 16px; right: 16px; bottom: 16px;
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: 25px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 10px;
+      box-shadow: 0 16px 34px rgba(30,70,62,.16);
+    }
+    nav button {
+      border: 0; background: transparent; color: var(--muted);
+      padding: 9px 4px; border-radius: 16px; font-weight: 800; font-size: 12px;
+    }
+    nav button.active { background: var(--primary-2); color: var(--primary); }
+
+    .toast {
+      position: absolute;
+      left: 24px; right: 24px; bottom: 92px;
+      background: #203530;
+      color: white;
+      border-radius: 16px;
+      padding: 13px 15px;
+      font-size: 14px;
+      transform: translateY(140%);
+      opacity: 0;
+      transition: .25s ease;
+      box-shadow: 0 12px 28px rgba(0,0,0,.22);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="phone" role="application" aria-label="HRT tracker calm cards mockup">
+    <div class="status"><span>9:41</span><span>●●● 82%</span></div>
+    <header>
+      <div>
+        <p class="eyebrow">Today · Local only</p>
+        <h1>Medication</h1>
+      </div>
+      <button class="icon-button" aria-label="Settings">⚙</button>
+    </header>
+
+    <main>
+      <section class="hero-card" aria-labelledby="next-dose-title">
+        <div class="card-top">
+          <span class="label" id="next-dose-title">Next dose</span>
+          <span class="pill">Reminder on</span>
+        </div>
+        <div class="next-dose">8:00 PM</div>
+        <p class="subtitle">Estradiol · evening dose. This plan is stored on this device.</p>
+        <button id="takenButton" class="primary">Mark dose taken</button>
+      </section>
+
+      <div class="section-title"><h2>Schedule</h2><span class="link">Edit plan</span></div>
+      <section class="stack">
+        <article class="dose-card">
+          <div class="med-icon">E</div>
+          <div><h3>Estradiol</h3><p>Morning and evening</p></div>
+          <div class="time">8 AM<br>8 PM</div>
+        </article>
+        <article class="dose-card">
+          <div class="med-icon blocker">T</div>
+          <div><h3>T-blocker</h3><p>Optional blocker schedule</p><div class="optional">Can be removed for estrogen-only plans</div></div>
+          <div class="time">9 PM</div>
+        </article>
+      </section>
+
+      <aside class="reminder"><strong>🔔</strong><span>Local reminders are enabled. No account or cloud sync is required for phase 1.</span></aside>
+    </main>
+
+    <nav aria-label="Primary navigation">
+      <button class="active">Today</button>
+      <button>Schedule</button>
+      <button>Settings</button>
+    </nav>
+    <div id="toast" class="toast" role="status">Dose marked taken · next reminder stays local</div>
+  </div>
+
+  <script>
+    const button = document.getElementById('takenButton');
+    const toast = document.getElementById('toast');
+    button.addEventListener('click', () => {
+      button.textContent = 'Taken at 9:41 AM';
+      button.classList.add('taken');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2600);
+    });
+  </script>
+</body>
+</html>

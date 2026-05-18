@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HRT Tracker Android Mockup — Compact Schedule</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --text: #111827;
+      --muted: #67707f;
+      --primary: #315f77;
+      --primary-soft: #e2f0f6;
+      --purple: #6750a4;
+      --purple-soft: #eee8ff;
+      --line: #dde3ea;
+      --success: #2d6b4f;
+      font-family: Roboto, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #dfe5ea; color: var(--text); }
+    .phone { width: min(100vw, 390px); min-height: 844px; background: var(--bg); position: relative; overflow: hidden; box-shadow: 0 26px 70px rgba(20, 29, 37, .24); }
+    .status { height: 32px; padding: 9px 20px 0; display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; }
+    .topbar { height: 58px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; }
+    .topbar h1 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; font-weight: 900; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 14px; }
+    .tab { border: 0; border-radius: 999px; padding: 11px 10px; background: transparent; color: var(--muted); font-weight: 800; }
+    .tab.active { color: var(--primary); background: var(--primary-soft); }
+    main { padding: 0 14px 88px; }
+    .summary { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 15px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; box-shadow: 0 8px 22px rgba(24, 42, 56, .06); }
+    .summary p { margin: 0; color: var(--muted); font-size: 13px; }
+    .summary h2 { margin: 3px 0 0; font-size: 30px; letter-spacing: -.04em; }
+    .take { border: 0; border-radius: 15px; padding: 13px 15px; color: #fff; background: var(--primary); font-weight: 900; min-width: 96px; }
+    .take.done { background: var(--success); }
+    .notice { margin: 12px 2px; padding: 10px 12px; border-radius: 14px; background: #eef8f2; color: #2f684d; font-size: 13px; line-height: 1.35; }
+    .day-row { margin-top: 16px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+    .day { background: #fff; border: 1px solid var(--line); border-radius: 15px; padding: 8px 0; text-align: center; font-size: 12px; color: var(--muted); }
+    .day strong { display: block; margin-top: 4px; color: var(--text); font-size: 15px; }
+    .day.today { background: #102d3b; color: #d7edf6; border-color: #102d3b; }
+    .day.today strong { color: white; }
+    .section-head { display: flex; justify-content: space-between; align-items: center; margin: 20px 4px 10px; }
+    .section-head h3 { margin: 0; font-size: 16px; }
+    .section-head span { color: var(--muted); font-size: 13px; }
+    .list { display: grid; gap: 9px; }
+    .row { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 13px; display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; }
+    .time { font-size: 18px; font-weight: 900; color: var(--primary); }
+    .row h4 { margin: 0 0 3px; font-size: 15px; }
+    .row p { margin: 0; color: var(--muted); font-size: 12.5px; }
+    .badge { border-radius: 999px; padding: 7px 9px; background: var(--primary-soft); color: var(--primary); font-size: 12px; font-weight: 900; }
+    .badge.optional { background: var(--purple-soft); color: var(--purple); }
+    .settings-panel { display: none; margin-top: 12px; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+    .settings-panel.show { display: block; }
+    .settings-panel h3 { margin: 0 0 8px; }
+    .settings-panel p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .switch-row { display:flex; justify-content:space-between; align-items:center; padding-top: 8px; border-top: 1px solid var(--line); font-weight: 800; }
+    .switch { width: 48px; height: 28px; border-radius: 99px; background: var(--primary); position: relative; }
+    .switch::after { content:""; position:absolute; right:3px; top:3px; width:22px; height:22px; background:#fff; border-radius:50%; }
+    .bottom { position:absolute; left:0; right:0; bottom:0; padding: 10px 16px 18px; background: linear-gradient(transparent, var(--bg) 20%); }
+    .fab { width:100%; border:0; border-radius: 20px; padding: 16px; background:#1d3846; color:#fff; font-weight:900; font-size:15px; box-shadow: 0 14px 26px rgba(29,56,70,.22); }
+  </style>
+</head>
+<body>
+  <div class="phone" role="application" aria-label="HRT tracker compact schedule mockup">
+    <div class="status"><span>9:41</span><span>5G ▰</span></div>
+    <div class="topbar"><h1>Today</h1><div class="avatar" aria-label="Local profile">L</div></div>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-panel="today">Today</button>
+      <button class="tab" data-panel="schedule">Schedule</button>
+      <button class="tab" data-panel="settings">Reminders</button>
+    </div>
+
+    <main>
+      <section class="summary">
+        <div><p>Next dose</p><h2>8:00 PM</h2><p>Estradiol · evening</p></div>
+        <button id="take" class="take">Take</button>
+      </section>
+      <div class="notice">No login needed. Medication schedule and reminders stay on this Android device.</div>
+
+      <div class="day-row" aria-label="Week overview">
+        <div class="day">M<strong>13</strong></div><div class="day">T<strong>14</strong></div><div class="day today">W<strong>15</strong></div><div class="day">T<strong>16</strong></div><div class="day">F<strong>17</strong></div><div class="day">S<strong>18</strong></div><div class="day">S<strong>19</strong></div>
+      </div>
+
+      <div class="section-head"><h3>Medication schedule</h3><span>3 items</span></div>
+      <section class="list">
+        <article class="row"><div class="time">8 AM</div><div><h4>Estradiol</h4><p>Morning dose</p></div><span class="badge">Done</span></article>
+        <article class="row"><div class="time">8 PM</div><div><h4>Estradiol</h4><p>Evening dose</p></div><span class="badge">Next</span></article>
+        <article class="row"><div class="time">9 PM</div><div><h4>T-blocker</h4><p>Optional · hide for estrogen-only plans</p></div><span class="badge optional">Optional</span></article>
+      </section>
+
+      <section id="settingsPanel" class="settings-panel" aria-live="polite">
+        <h3>Reminder status</h3>
+        <p>Local notifications are enabled for scheduled doses. They can be turned off without changing the medication plan.</p>
+        <div class="switch-row"><span>Local reminders</span><span class="switch" aria-label="on"></span></div>
+      </section>
+    </main>
+
+    <div class="bottom"><button class="fab">Adjust local schedule</button></div>
+  </div>
+
+  <script>
+    const take = document.getElementById('take');
+    take.addEventListener('click', () => {
+      take.textContent = 'Taken';
+      take.classList.add('done');
+    });
+
+    const tabs = document.querySelectorAll('.tab');
+    const settingsPanel = document.getElementById('settingsPanel');
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      settingsPanel.classList.toggle('show', tab.dataset.panel === 'settings');
+    }));
+  </script>
+</body>
+</html>
