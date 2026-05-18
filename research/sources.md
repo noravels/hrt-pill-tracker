@@ -92,6 +92,52 @@ Product implications:
 - The schedule should track the user’s intended dose, not assume every product maps to exactly one category.
 - For MVP, we can still let the user label the estrogen medication as “Climen 2 mg sublingual”, but the data model should not prevent combination products.
 
+## 6. PMC - Effectiveness and Safety of Different Estradiol Regimens in Transgender Women (TREAT Study protocol)
+
+URL: https://pmc.ncbi.nlm.nih.gov/articles/PMC10770781/
+
+Relevant points extracted:
+
+- The protocol compares once-daily sublingual 17-beta estradiol, twice-daily sublingual 17-beta estradiol, and transdermal estradiol.
+- The dosing table includes once-daily and twice-daily sublingual regimens.
+- All participants in the protocol received spironolactone, so this is not monotherapy evidence; it is useful for route/frequency modeling.
+
+Product implications:
+
+- Sublingual estradiol frequency varies; the app should not hardcode only one or two fixed daily times.
+- Even if the MVP user uses every 12 hours, the schedule model should support every 8 hours, every 6 hours, and arbitrary intervals.
+
+## 7. PMC - Injectable Estradiol Dosing Regimens in Transgender and Nonbinary Adults Listed as Male at Birth
+
+URL: https://pmc.ncbi.nlm.nih.gov/articles/PMC11957913/
+
+Relevant points extracted:
+
+- The abstract describes standard therapy as estradiol, with or without an antiandrogen.
+- The paper discusses injectable estradiol and mentions estradiol monotherapy in the context of testosterone suppression findings.
+- The cohort used once-weekly subcutaneous or intramuscular estradiol.
+
+Product implications:
+
+- A treatment plan must allow estrogen monotherapy / monodosing: no T-blocker required.
+- Injection schedules are usually weekly-ish rather than hourly/daily, so interval schedules must support days/weeks as well as hours.
+- Route/form modeling must support injectable estrogen separately from oral/sublingual tablets.
+
+## 8. Transfeminine Science - Sublingual estradiol overview
+
+URL: https://transfemscience.org/articles/sublingual-e2-transfem/
+
+Relevant points extracted:
+
+- Discusses pharmacology of sublingual estradiol and multiple sublingual doses per day.
+- Discusses sublingual estradiol monotherapy in available/limited data context.
+- Mentions studies comparing once-daily and twice-daily sublingual estradiol, and notes evidence limitations.
+
+Product implications:
+
+- Product should support multiple daily sublingual doses and user-defined split dosing.
+- The app should avoid medical conclusions/recommendations and only track the schedule the user configures.
+
 ## Notes on source reliability and use
 
 - Medical guideline/source content is used only to identify real-world schedule/product shapes the app may need to represent.

@@ -21,8 +21,12 @@ User pattern to support first:
   - User dose example: 2 mg.
   - Route example: sublingual.
   - Interval example: every 12 hours.
+  - Some users may split estrogen more frequently, e.g. every 8 hours or every 6 hours.
+- Monodosing / estrogen monotherapy:
+  - Some users do not take a T-blocker and only track estrogen.
+  - The app must not require a testosterone blocker medication to exist.
 
-The tracker must handle estrogen and T-blocker schedules independently because their intervals can differ.
+The tracker must handle estrogen and T-blocker schedules independently because their intervals can differ. It must also allow a treatment plan with only estrogen or only another medication category.
 
 ## High-level findings
 
@@ -36,6 +40,8 @@ The tracker must handle estrogen and T-blocker schedules independently because t
    - physical form amount, e.g. 0.25 tablet of a 50 mg tablet
    - route, e.g. oral/sublingual/transdermal/injection
 7. Brands and products should be optional metadata. The schedule should not depend on a brand name.
+8. A treatment plan must allow zero or more medications per category. Estrogen monotherapy/monodosing means the plan may have no T-blocker at all.
+9. Estrogen schedules must support arbitrary intervals such as 12h, 8h, 6h, or user-defined intervals; do not hardcode BID/twice-daily.
 
 ## Medication/category model implications
 
@@ -57,7 +63,7 @@ MedicationCategory
   - other
 ```
 
-A `Medication` should represent a thing the user takes/tracks. It should not assume there is only one drug per category.
+A `Medication` should represent a thing the user takes/tracks. It should not assume there is only one drug per category, and the treatment plan should not require all categories to be present. Estrogen-only plans are valid.
 
 Examples:
 
@@ -172,7 +178,11 @@ Androcur:
 
 Estrogen:
   schedule.type = interval
-  interval = 12 hours
+  interval = 12 hours, 8 hours, 6 hours, or any user-defined value
+
+Estrogen monotherapy / monodosing:
+  treatment.medications may contain only estrogen medication(s)
+  no T-blocker medication is required for next-dose, taken-count, or reminder calculations
 ```
 
 ## Dose event model

@@ -10,6 +10,8 @@ This document converts research notes into technical constraints for the initial
 4. Medication model separates product, active ingredients, physical dose, route, and schedule.
 5. Taken counts and next dose are derived from dose events and schedules.
 6. The first implementation can support the T-Fem-like two-medication use case without hardcoding the whole domain to only two medications.
+7. Treatment plans may be monotherapy/monodosing plans. No medication category should be mandatory.
+8. Estrogen split dosing must be user-defined; support 12h, 8h, 6h, and arbitrary intervals rather than fixed BID-only assumptions.
 
 ## Proposed entities
 
@@ -93,7 +95,18 @@ Medication 2:
   active ingredient: estradiol or user-defined estradiol label 2 mg
   physical dose: 1 tablet unless user edits
   route: sublingual
-  schedule: every 12 hours from user-selected first dose time
+  schedule: default every 12 hours from user-selected first dose time; user can change to every 8 hours, every 6 hours, or another interval
+
+Alternative preset: estrogen monotherapy / monodosing
+
+Medication 1:
+  category: estrogen
+  displayName: Estradiol / Climen or custom estrogen product
+  active ingredient: user-defined estradiol label and amount
+  route: sublingual/oral/patch/gel/injection as selected
+  schedule: user-defined interval or future daily/weekly schedule
+
+No testosterone blocker medication is required in this preset.
 ```
 
 The preset must be editable before saving.
@@ -118,9 +131,13 @@ Need decide later:
    - Should quarter-tablet consumption subtract 0.25 from stock?
    - Not MVP, but physical dose model enables this later.
 
-5. Dose units:
+6. Dose units:
    - Need decimal-safe representation. Avoid binary floating point for mg/tablet fractions.
    - Kotlin: store decimal as string or scaled integer.
+
+7. Monotherapy naming:
+   - Users may call estrogen-only regimens “monodosing” or “monotherapy”. UI copy should probably say “östrojen-only / monotherapy” and avoid implying it is recommended.
+   - Core should simply treat this as a plan with one or more estrogen medications and zero T-blockers.
 
 ## Test cases to write first
 
@@ -130,6 +147,9 @@ Need decide later:
 4. Given a quarter-tablet physical dose, display formatter returns “1/4 tablet (12.5 mg cyproterone acetate)” or equivalent.
 5. Given fixed-anchor drift policy and a late taken dose, future occurrences remain anchored to the original grid.
 6. Given reminder horizon of 7 days, core emits reminder requests only within that horizon.
+7. Given estrogen anchored every 8 hours, next-dose calculation follows 8-hour intervals.
+8. Given estrogen anchored every 6 hours, next-dose calculation follows 6-hour intervals.
+9. Given an estrogen-only treatment plan with no T-blocker, summary, taken-count, next-dose, and reminders still work.
 
 ## Recommended initial tech stack after research
 
