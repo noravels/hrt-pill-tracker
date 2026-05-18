@@ -2,6 +2,7 @@ package app.transition.hrt.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Instant
@@ -143,6 +144,113 @@ class TreatmentServiceTest {
         assertEquals("after dinner", persisted.note)
     }
 
+    @Test
+    fun farPastMinuteAnchorCalculatesNextOccurrenceOnGridAtOrAfterNow() {
+        val schedule = Schedule.Interval(
+            anchorAt = Instant.parse("1970-01-01T00:00:00Z"),
+            intervalMinutes = 1,
+        )
+
+        val next = ScheduleCalculator.nextOccurrence(schedule, Instant.parse("2026-01-01T08:00:00Z"))
+
+        assertEquals(Instant.parse("2026-01-01T08:00:00Z"), next)
+    }
+
+    @Test
+    fun nextDoseIncludesDoseDueExactlyNow() {
+        val service = serviceWith(planWith(estrogen(intervalMinutes = 12 * 60)))
+
+        val next = service.nextDose(base)
+
+        assertNotNull(next)
+        assertEquals(base, next.scheduledAt)
+    }
+
+    @Test
+    fun buildRemindersIncludesDoseDueExactlyNowWithinHorizon() {
+        val service = serviceWith(planWith(estrogen(intervalMinutes = 12 * 60)))
+
+        val reminders = service.buildReminders(
+            now = base,
+            horizonEnd = Instant.parse("2026-01-01T21:00:00Z"),
+        )
+
+        assertEquals(listOf(base, Instant.parse("2026-01-01T20:00:00Z")), reminders.map { it.fireAt })
+    }
+
+    @Test
+    fun buildRemindersSuppressesMedicationWithRemindersDisabled() {
+        val service = serviceWith(planWith(estrogen(intervalMinutes = 12 * 60, remindersEnabled = false)))
+
+        val reminders = service.buildReminders(
+            now = base,
+            horizonEnd = Instant.parse("2026-01-01T21:00:00Z"),
+        )
+
+        assertEquals(emptyList(), reminders)
+    }
+
+    @Test
+    fun domainModelsRejectRepresentativeInvalidValues() {
+        assertFailsWith<IllegalArgumentException> {
+            TreatmentPlan(id = " ", startedAt = base, timezone = "UTC", medications = emptyList())
+        }
+        assertFailsWith<IllegalArgumentException> {
+            TreatmentPlan(id = "plan", startedAt = base, timezone = " ", medications = emptyList())
+        }
+        assertFailsWith<IllegalArgumentException> { estrogen(id = "") }
+        assertFailsWith<IllegalArgumentException> { estrogen(displayName = "") }
+        assertFailsWith<IllegalArgumentException> { estrogen(activeIngredients = emptyList()) }
+        assertFailsWith<IllegalArgumentException> {
+            ActiveIngredientDose("estradiol", "Estradiol", " ", "mg")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            ActiveIngredientDose("estradiol", " ", "2", "mg")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            PhysicalDose(DoseForm.TABLET, quantityDecimal = " ", quantityUnit = "tablet")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            PhysicalDose(DoseForm.TABLET, quantityDecimal = "1", quantityUnit = " ")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            DoseEvent("event", "estrogen", base, DoseStatus.TAKEN, takenAt = null)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            DoseEvent(" ", "estrogen", base, DoseStatus.PENDING)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            DoseEvent("event", " ", base, DoseStatus.PENDING)
+        }
+    }
+
+    @Test
+    fun markTakenRequiresCurrentPlan() {
+        val service = TreatmentService(InMemoryTreatmentRepository(null), InMemoryDoseEventRepository(), FixedClock(base))
+
+        assertFailsWith<IllegalStateException> {
+            service.markTaken(medicationId = "estrogen", scheduledAt = base)
+        }
+    }
+
+    @Test
+    fun markTakenRequiresMedicationInCurrentPlan() {
+        val service = serviceWith(planWith(estrogen(intervalMinutes = 12 * 60)))
+
+        assertFailsWith<IllegalArgumentException> {
+            service.markTaken(medicationId = "unknown", scheduledAt = base)
+        }
+    }
+
+    @Test
+    fun markTakenRequiresScheduledAtOnMedicationScheduleGrid() {
+        val service = serviceWith(planWith(estrogen(intervalMinutes = 12 * 60)))
+
+        assertFailsWith<IllegalArgumentException> {
+            service.markTaken(medicationId = "estrogen", scheduledAt = Instant.parse("2026-01-01T09:00:00Z"))
+        }
+    }
+
     private fun serviceWith(
         plan: TreatmentPlan,
         eventRepository: InMemoryDoseEventRepository = InMemoryDoseEventRepository(),
@@ -161,16 +269,20 @@ class TreatmentServiceTest {
         anchorAt: Instant = base,
         physicalDose: PhysicalDose? = null,
         ingredientAmount: String = "2",
+        id: String = "estrogen",
+        displayName: String = "Estradiol",
+        activeIngredients: List<ActiveIngredientDose> = listOf(ActiveIngredientDose("estradiol", "Estradiol", ingredientAmount, "mg")),
+        remindersEnabled: Boolean = true,
     ) = Medication(
-        id = "estrogen",
+        id = id,
         category = MedicationCategory.ESTROGEN,
-        displayName = "Estradiol",
+        displayName = displayName,
         productName = "Estradiol tablets",
-        activeIngredients = listOf(ActiveIngredientDose("estradiol", "Estradiol", ingredientAmount, "mg")),
+        activeIngredients = activeIngredients,
         physicalDose = physicalDose,
         route = AdministrationRoute.ORAL,
         schedule = Schedule.Interval(anchorAt = anchorAt, intervalMinutes = intervalMinutes),
-        remindersEnabled = true,
+        remindersEnabled = remindersEnabled,
     )
 
     private fun blocker(

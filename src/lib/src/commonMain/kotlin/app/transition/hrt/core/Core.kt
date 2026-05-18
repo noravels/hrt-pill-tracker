@@ -1,5 +1,6 @@
 package app.transition.hrt.core
 
+import kotlin.math.ceil
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
@@ -9,7 +10,12 @@ data class TreatmentPlan(
     val startedAt: Instant,
     val timezone: String,
     val medications: List<Medication>,
-)
+) {
+    init {
+        require(id.isNotBlank()) { "TreatmentPlan id must not be blank" }
+        require(timezone.isNotBlank()) { "TreatmentPlan timezone must not be blank" }
+    }
+}
 
 data class Medication(
     val id: String,
@@ -23,7 +29,13 @@ data class Medication(
     val schedule: Schedule,
     val remindersEnabled: Boolean,
     val notes: String? = null,
-)
+) {
+    init {
+        require(id.isNotBlank()) { "Medication id must not be blank" }
+        require(displayName.isNotBlank()) { "Medication displayName must not be blank" }
+        require(activeIngredients.isNotEmpty()) { "Medication activeIngredients must not be empty" }
+    }
+}
 
 enum class MedicationCategory {
     ESTROGEN,
@@ -38,7 +50,14 @@ data class ActiveIngredientDose(
     /** Decimal-safe value represented as text; callers decide precision rules. */
     val amount: String,
     val unit: String,
-)
+) {
+    init {
+        require(ingredientId.isNotBlank()) { "ActiveIngredientDose ingredientId must not be blank" }
+        require(displayName.isNotBlank()) { "ActiveIngredientDose displayName must not be blank" }
+        require(amount.isNotBlank()) { "ActiveIngredientDose amount must not be blank" }
+        require(unit.isNotBlank()) { "ActiveIngredientDose unit must not be blank" }
+    }
+}
 
 data class PhysicalDose(
     val form: DoseForm,
@@ -46,7 +65,12 @@ data class PhysicalDose(
     val quantityUnit: String,
     val fractionLabel: String? = null,
     val productUnitStrengthLabel: String? = null,
-)
+) {
+    init {
+        require(quantityDecimal.isNotBlank()) { "PhysicalDose quantityDecimal must not be blank" }
+        require(quantityUnit.isNotBlank()) { "PhysicalDose quantityUnit must not be blank" }
+    }
+}
 
 enum class DoseForm {
     TABLET,
@@ -88,7 +112,13 @@ data class DoseEvent(
     val status: DoseStatus,
     val takenAt: Instant? = null,
     val note: String? = null,
-)
+) {
+    init {
+        require(id.isNotBlank()) { "DoseEvent id must not be blank" }
+        require(medicationId.isNotBlank()) { "DoseEvent medicationId must not be blank" }
+        require(status != DoseStatus.TAKEN || takenAt != null) { "DoseEvent takenAt must not be null when status is TAKEN" }
+    }
+}
 
 enum class DoseStatus {
     PENDING,
@@ -129,9 +159,6 @@ interface DoseEventRepository {
     fun save(event: DoseEvent)
 }
 
-interface MedicationRepository
-interface SettingsRepository
-
 interface Clock {
     fun now(): Instant
 }
@@ -162,17 +189,20 @@ object ScheduleCalculator {
     }
 
     private fun nextIntervalOccurrence(schedule: Schedule.Interval, now: Instant): Instant {
-        val firstAtOrAfter = firstIntervalOccurrenceAtOrAfter(schedule, now)
-        return if (firstAtOrAfter <= now) firstAtOrAfter.plus(schedule.intervalMinutes.minutes) else firstAtOrAfter
+        return firstIntervalOccurrenceAtOrAfter(schedule, now)
     }
 
     private fun firstIntervalOccurrenceAtOrAfter(schedule: Schedule.Interval, instant: Instant): Instant {
         if (instant <= schedule.anchorAt) return schedule.anchorAt
-        var cursor = schedule.anchorAt
-        while (cursor < instant) {
-            cursor = cursor.plus(schedule.intervalMinutes.minutes)
-        }
-        return cursor
+        val interval = schedule.intervalMinutes.minutes
+        val elapsedIntervals = (instant - schedule.anchorAt) / interval
+        val intervalsToAdd = ceil(elapsedIntervals).toLong()
+        val minutesToAdd = schedule.intervalMinutes * intervalsToAdd
+        return schedule.anchorAt.plus(minutesToAdd.minutes)
+    }
+
+    fun isOccurrence(schedule: Schedule, instant: Instant): Boolean = when (schedule) {
+        is Schedule.Interval -> instant >= schedule.anchorAt && firstIntervalOccurrenceAtOrAfter(schedule, instant) == instant
     }
 }
 
@@ -202,6 +232,13 @@ class TreatmentService(
     }
 
     fun markTaken(medicationId: String, scheduledAt: Instant, note: String? = null): DoseEvent {
+        val plan = treatmentRepository.currentTreatmentPlan()
+            ?: throw IllegalStateException("Cannot mark a dose taken without a current treatment plan")
+        val medication = plan.medications.firstOrNull { it.id == medicationId }
+            ?: throw IllegalArgumentException("Medication $medicationId is not in the current treatment plan")
+        require(ScheduleCalculator.isOccurrence(medication.schedule, scheduledAt)) {
+            "scheduledAt must be an occurrence for medication $medicationId"
+        }
         val event = DoseEvent(
             id = "taken-$medicationId-$scheduledAt",
             medicationId = medicationId,
@@ -219,7 +256,7 @@ class TreatmentService(
 
     fun buildReminders(now: Instant = clock.now(), horizonEnd: Instant): List<ReminderRequest> {
         val plan = treatmentRepository.currentTreatmentPlan() ?: return emptyList()
-        if (horizonEnd <= now) return emptyList()
+        if (horizonEnd < now) return emptyList()
         val completed = doseEventRepository.events()
             .filter { it.status == DoseStatus.TAKEN || it.status == DoseStatus.SKIPPED || it.status == DoseStatus.MISSED }
             .map { it.medicationId to it.scheduledAt }
@@ -229,7 +266,7 @@ class TreatmentService(
             .filter { it.remindersEnabled }
             .flatMap { medication ->
                 ScheduleCalculator.occurrences(medication.schedule, now, horizonEnd)
-                    .filter { scheduledAt -> scheduledAt > now }
+                    .filter { scheduledAt -> scheduledAt >= now }
                     .filter { scheduledAt -> (medication.id to scheduledAt) !in completed }
                     .map { scheduledAt ->
                         ReminderRequest(
