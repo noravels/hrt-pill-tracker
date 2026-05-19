@@ -17,3 +17,6 @@ dependencyResolutionManagement {
 rootProject.name = "hrt-pill-tracker"
 include(":lib")
 project(":lib").projectDir = file("src/lib")
+
+include(":android")
+project(":android").projectDir = file("src/android")

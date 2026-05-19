@@ -6,6 +6,7 @@ build/
 
 # Local JVM/tooling
 .java-version
+local.properties
 
 # Node/web tooling (future web client)
 node_modules/
