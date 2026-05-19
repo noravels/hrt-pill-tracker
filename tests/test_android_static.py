@@ -76,6 +76,19 @@ class AndroidStaticTest(unittest.TestCase):
             self.assertIn(f'name="{name}"', en)
             self.assertIn(f'name="{name}"', tr)
 
+    def test_app_starts_in_setup_without_seeded_medication_data(self):
+        source = read(ANDROID / "src" / "main" / "java" / "app" / "transition" / "hrt" / "android" / "MainActivity.kt")
+        en = read(ANDROID / "src" / "main" / "res" / "values" / "strings.xml")
+        tr = read(ANDROID / "src" / "main" / "res" / "values-tr" / "strings.xml")
+
+        self.assertIn("mutableStateOf(AppScreen.Setup)", source)
+        self.assertIn("routineConfigured", source)
+        self.assertIn("OutlinedTextField", source)
+        self.assertNotIn("estradiol_name", source)
+        self.assertNotIn("estradiol_dose", source)
+        self.assertNotIn("Estradiol", en)
+        self.assertNotIn("Estradiol", tr)
+
 
 if __name__ == "__main__":
     unittest.main()

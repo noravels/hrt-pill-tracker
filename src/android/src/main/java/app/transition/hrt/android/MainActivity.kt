@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -63,8 +63,12 @@ private enum class AppScreen { Today, Routine, Setup }
 @Composable
 fun HrtTrackerApp() {
     MaterialTheme {
-        var screen by remember { mutableStateOf(AppScreen.Today) }
+        var screen by remember { mutableStateOf(AppScreen.Setup) }
+        var routineConfigured by remember { mutableStateOf(false) }
         var taken by remember { mutableStateOf(false) }
+        var medicationName by remember { mutableStateOf("") }
+        var dose by remember { mutableStateOf("") }
+        var schedule by remember { mutableStateOf("") }
         val context = LocalContext.current
 
         Surface(color = Paper, modifier = Modifier.fillMaxSize()) {
@@ -81,6 +85,10 @@ fun HrtTrackerApp() {
                     StatusRow()
                     when (screen) {
                         AppScreen.Today -> TodayScreen(
+                            routineConfigured = routineConfigured,
+                            medicationName = medicationName,
+                            dose = dose,
+                            schedule = schedule,
                             taken = taken,
                             onMarkTaken = {
                                 taken = true
@@ -90,10 +98,33 @@ fun HrtTrackerApp() {
                             onRoutine = { screen = AppScreen.Routine },
                         )
 
-                        AppScreen.Setup -> SetupScreen(onBack = { screen = AppScreen.Today })
-                        AppScreen.Routine -> RoutineScreen(onBack = { screen = AppScreen.Today })
+                        AppScreen.Setup -> SetupScreen(
+                            medicationName = medicationName,
+                            onMedicationNameChange = { medicationName = it },
+                            dose = dose,
+                            onDoseChange = { dose = it },
+                            schedule = schedule,
+                            onScheduleChange = { schedule = it },
+                            onSave = {
+                                routineConfigured = medicationName.isNotBlank() && dose.isNotBlank()
+                                taken = false
+                                screen = if (routineConfigured) AppScreen.Today else AppScreen.Setup
+                            },
+                            onBack = { screen = if (routineConfigured) AppScreen.Today else AppScreen.Setup },
+                        )
+
+                        AppScreen.Routine -> RoutineScreen(
+                            routineConfigured = routineConfigured,
+                            medicationName = medicationName,
+                            dose = dose,
+                            schedule = schedule,
+                            onBack = { screen = AppScreen.Today },
+                            onSetup = { screen = AppScreen.Setup },
+                        )
                     }
-                    BottomNav(selected = screen, onSelect = { screen = it })
+                    BottomNav(selected = screen, routineConfigured = routineConfigured, onSelect = { selected ->
+                        screen = if (selected == AppScreen.Today && !routineConfigured) AppScreen.Setup else selected
+                    })
                 }
                 SideIdentityRail(color = TransPink)
             }
@@ -103,6 +134,10 @@ fun HrtTrackerApp() {
 
 @Composable
 private fun TodayScreen(
+    routineConfigured: Boolean,
+    medicationName: String,
+    dose: String,
+    schedule: String,
     taken: Boolean,
     onMarkTaken: () -> Unit,
     onSetup: () -> Unit,
@@ -114,36 +149,67 @@ private fun TodayScreen(
         action = stringResource(R.string.setup_short),
         onAction = onSetup,
     )
-    DoseCard(taken = taken, onMarkTaken = onMarkTaken)
+    if (!routineConfigured) {
+        EmptyRoutineCard(onSetup = onSetup)
+        return
+    }
+    DoseCard(medicationName = medicationName, dose = dose, schedule = schedule, taken = taken, onMarkTaken = onMarkTaken)
     InfoCard(title = stringResource(R.string.active_routine_title), tint = SoftBlue, action = stringResource(R.string.edit_action), onAction = onSetup) {
-        RoutineRow(time = "09/21", title = stringResource(R.string.estradiol_name), detail = stringResource(R.string.fixed_anchor_schedule), badge = "2×", badgeColor = TransBlue)
-        RoutineRow(time = stringResource(R.string.weekday_friday), title = stringResource(R.string.blocker_name), detail = stringResource(R.string.optional_hidden), badge = stringResource(R.string.badge_optional), badgeColor = TransPink)
+        RoutineRow(time = schedule.ifBlank { stringResource(R.string.schedule_not_set) }, title = medicationName, detail = dose, badge = "1×", badgeColor = TransBlue)
     }
     InfoCard(title = stringResource(R.string.next_24_hours_title), tint = SoftPink, action = stringResource(R.string.all_action), onAction = onRoutine) {
-        RoutineRow(time = stringResource(R.string.dose_time), title = stringResource(R.string.take_window_title), detail = stringResource(R.string.no_guilt_copy), badge = stringResource(R.string.badge_now), badgeColor = TransBlue)
-        RoutineRow(time = "09:00", title = stringResource(R.string.tomorrow_title), detail = stringResource(R.string.next_anchor_copy), badge = stringResource(R.string.badge_next), badgeColor = TransWhite)
+        RoutineRow(time = schedule.ifBlank { stringResource(R.string.schedule_not_set) }, title = stringResource(R.string.take_window_title), detail = stringResource(R.string.no_guilt_copy), badge = stringResource(R.string.badge_next), badgeColor = TransWhite)
     }
 }
 
 @Composable
-private fun SetupScreen(onBack: () -> Unit) {
-    Header(title = stringResource(R.string.setup_title), subtitle = stringResource(R.string.local_only_label), action = stringResource(R.string.back_action), onAction = onBack)
-    FormField(label = stringResource(R.string.medication_label), value = stringResource(R.string.estradiol_name), tint = SoftBlue)
-    FormField(label = stringResource(R.string.dose_label), value = stringResource(R.string.estradiol_dose), tint = SoftPink)
-    FormField(label = stringResource(R.string.interval_label), value = stringResource(R.string.interval_value), tint = Paper)
-    FormField(label = stringResource(R.string.privacy_label), value = stringResource(R.string.privacy_value), tint = SoftBlue)
-    BlockButton(text = stringResource(R.string.save_local_routine), color = TransPink, onClick = onBack)
+private fun SetupScreen(
+    medicationName: String,
+    onMedicationNameChange: (String) -> Unit,
+    dose: String,
+    onDoseChange: (String) -> Unit,
+    schedule: String,
+    onScheduleChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onBack: () -> Unit,
+) {
+    Header(title = stringResource(R.string.setup_title), subtitle = stringResource(R.string.setup_subtitle), action = stringResource(R.string.back_action), onAction = onBack)
+    InputCard(label = stringResource(R.string.medication_label), value = medicationName, onValueChange = onMedicationNameChange, placeholder = stringResource(R.string.medication_placeholder), tint = SoftBlue)
+    InputCard(label = stringResource(R.string.dose_label), value = dose, onValueChange = onDoseChange, placeholder = stringResource(R.string.dose_placeholder), tint = SoftPink)
+    InputCard(label = stringResource(R.string.schedule_label), value = schedule, onValueChange = onScheduleChange, placeholder = stringResource(R.string.schedule_placeholder), tint = Paper)
+    InfoCard(title = stringResource(R.string.privacy_label), tint = SoftBlue, action = "", onAction = {}) {
+        Text(stringResource(R.string.privacy_value), color = Ink, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+    }
+    BlockButton(text = stringResource(R.string.save_local_routine), color = TransPink, onClick = onSave)
 }
 
 @Composable
-private fun RoutineScreen(onBack: () -> Unit) {
+private fun RoutineScreen(
+    routineConfigured: Boolean,
+    medicationName: String,
+    dose: String,
+    schedule: String,
+    onBack: () -> Unit,
+    onSetup: () -> Unit,
+) {
     Header(title = stringResource(R.string.routine_title), subtitle = stringResource(R.string.routine_subtitle_week), action = stringResource(R.string.back_action), onAction = onBack)
-    InfoCard(title = stringResource(R.string.fixed_anchors_title), tint = SoftBlue, action = stringResource(R.string.no_streaks), onAction = {}) {
-        RoutineRow(time = stringResource(R.string.daily_label), title = "09:00 · 21:00", detail = stringResource(R.string.estradiol_reminders), badge = stringResource(R.string.badge_on), badgeColor = TransBlue)
-        RoutineRow(time = stringResource(R.string.weekday_friday), title = stringResource(R.string.dose_time), detail = stringResource(R.string.optional_blocker_reminder), badge = stringResource(R.string.badge_optional), badgeColor = TransPink)
+    if (!routineConfigured) {
+        EmptyRoutineCard(onSetup = onSetup)
+        return
+    }
+    InfoCard(title = stringResource(R.string.fixed_anchors_title), tint = SoftBlue, action = stringResource(R.string.edit_action), onAction = onSetup) {
+        RoutineRow(time = schedule.ifBlank { stringResource(R.string.schedule_not_set) }, title = medicationName, detail = dose, badge = stringResource(R.string.badge_on), badgeColor = TransBlue)
         RoutineRow(time = stringResource(R.string.any_time_label), title = stringResource(R.string.missed_window_title), detail = stringResource(R.string.missed_window_copy), badge = stringResource(R.string.badge_log), badgeColor = TransWhite)
     }
     BlockButton(text = stringResource(R.string.today_tab), color = TransBlue, onClick = onBack)
+}
+
+@Composable
+private fun EmptyRoutineCard(onSetup: () -> Unit) {
+    InfoCard(title = stringResource(R.string.empty_routine_title), tint = SoftBlue, action = "", onAction = {}) {
+        Text(stringResource(R.string.empty_routine_body), color = Ink, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        BlockButton(text = stringResource(R.string.add_first_medication), color = TransPink, onClick = onSetup)
+    }
 }
 
 @Composable
@@ -157,7 +223,7 @@ private fun StatusRow() {
 @Composable
 private fun Header(title: String, subtitle: String, action: String, onAction: () -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(title, color = Ink, fontSize = 30.sp, fontWeight = FontWeight.Black, lineHeight = 30.sp)
             Text(subtitle, color = Muted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
@@ -166,15 +232,15 @@ private fun Header(title: String, subtitle: String, action: String, onAction: ()
 }
 
 @Composable
-private fun DoseCard(taken: Boolean, onMarkTaken: () -> Unit) {
+private fun DoseCard(medicationName: String, dose: String, schedule: String, taken: Boolean, onMarkTaken: () -> Unit) {
     StructuralCard(background = TransWhite, modifier = Modifier.fillMaxWidth()) {
         Row {
             DoseIdentityRail()
             Column(Modifier.padding(18.dp).weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 LabelText(stringResource(R.string.next_dose_label))
-                Text(stringResource(R.string.dose_time), color = Ink, fontSize = 80.sp, lineHeight = 74.sp, fontWeight = FontWeight.Black)
-                Text(stringResource(R.string.estradiol_dose), color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
-                Text(stringResource(R.string.dose_details), color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(schedule.ifBlank { stringResource(R.string.schedule_not_set) }, color = Ink, fontSize = 58.sp, lineHeight = 56.sp, fontWeight = FontWeight.Black)
+                Text(medicationName, color = Ink, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                Text(dose, color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 BlockButton(
                     text = if (taken) stringResource(R.string.taken_state) else stringResource(R.string.mark_dose_taken),
                     color = TransBlue,
@@ -199,11 +265,15 @@ private fun InfoCard(title: String, tint: Color, action: String, onAction: () ->
 }
 
 @Composable
-private fun FormField(label: String, value: String, tint: Color) {
+private fun InputCard(label: String, value: String, onValueChange: (String) -> Unit, placeholder: String, tint: Color) {
     InfoCard(title = label, tint = tint, action = "", onAction = {}) {
-        Box(Modifier.fillMaxWidth().border(2.dp, Ink, RoundedCornerShape(17.dp)).background(Paper, RoundedCornerShape(17.dp)).padding(15.dp)) {
-            Text(value, color = Ink, fontWeight = FontWeight.Black)
-        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text(placeholder) },
+            singleLine = true,
+        )
     }
 }
 
@@ -218,7 +288,7 @@ private fun RoutineRow(time: String, title: String, detail: String, badge: Strin
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(time, modifier = Modifier.width(56.dp), color = Ink, fontWeight = FontWeight.Black, fontSize = 13.sp)
+        Text(time, modifier = Modifier.width(68.dp), color = Ink, fontWeight = FontWeight.Black, fontSize = 13.sp)
         Column(Modifier.weight(1f)) {
             Text(title, color = Ink, fontWeight = FontWeight.Black, fontSize = 14.sp)
             Text(detail, color = Muted, fontWeight = FontWeight.Bold, fontSize = 12.sp)
@@ -228,7 +298,7 @@ private fun RoutineRow(time: String, title: String, detail: String, badge: Strin
 }
 
 @Composable
-private fun BottomNav(selected: AppScreen, onSelect: (AppScreen) -> Unit) {
+private fun BottomNav(selected: AppScreen, routineConfigured: Boolean, onSelect: (AppScreen) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -237,20 +307,21 @@ private fun BottomNav(selected: AppScreen, onSelect: (AppScreen) -> Unit) {
             .padding(7.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        NavItem(text = stringResource(R.string.today_tab), active = selected == AppScreen.Today, onClick = { onSelect(AppScreen.Today) }, modifier = Modifier.weight(1f))
-        NavItem(text = stringResource(R.string.routine_tab), active = selected == AppScreen.Routine, onClick = { onSelect(AppScreen.Routine) }, modifier = Modifier.weight(1f))
-        NavItem(text = stringResource(R.string.history_tab), active = false, onClick = {}, modifier = Modifier.weight(1f))
-        NavItem(text = stringResource(R.string.setup_tab), active = selected == AppScreen.Setup, onClick = { onSelect(AppScreen.Setup) }, modifier = Modifier.weight(1f))
+        NavItem(text = stringResource(R.string.today_tab), active = selected == AppScreen.Today, enabled = routineConfigured, onClick = { onSelect(AppScreen.Today) }, modifier = Modifier.weight(1f))
+        NavItem(text = stringResource(R.string.routine_tab), active = selected == AppScreen.Routine, enabled = routineConfigured, onClick = { onSelect(AppScreen.Routine) }, modifier = Modifier.weight(1f))
+        NavItem(text = stringResource(R.string.history_tab), active = false, enabled = false, onClick = {}, modifier = Modifier.weight(1f))
+        NavItem(text = stringResource(R.string.setup_tab), active = selected == AppScreen.Setup, enabled = true, onClick = { onSelect(AppScreen.Setup) }, modifier = Modifier.weight(1f))
     }
 }
 
 @Composable
-private fun NavItem(text: String, active: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun NavItem(text: String, active: Boolean, enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier.height(50.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = if (active) TransBlue else Color.Transparent, contentColor = if (active) Ink else Muted),
+        colors = ButtonDefaults.buttonColors(containerColor = if (active) TransBlue else Color.Transparent, contentColor = if (active) Ink else Muted, disabledContainerColor = Color.Transparent, disabledContentColor = Muted.copy(alpha = 0.42f)),
         elevation = null,
     ) { Text(text, fontSize = 12.sp, fontWeight = FontWeight.Black) }
 }
@@ -262,7 +333,7 @@ private fun BlockButton(text: String, color: Color, compact: Boolean = false, on
         shape = RoundedCornerShape(if (compact) 16.dp else 19.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = Ink),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-        modifier = if (compact) Modifier.size(width = 58.dp, height = 48.dp) else Modifier.fillMaxWidth().height(58.dp),
+        modifier = if (compact) Modifier.size(width = 72.dp, height = 48.dp) else Modifier.fillMaxWidth().height(58.dp),
     ) { Text(text, fontWeight = FontWeight.Black, fontSize = if (compact) 12.sp else 16.sp) }
 }
 
@@ -270,7 +341,6 @@ private fun BlockButton(text: String, color: Color, compact: Boolean = false, on
 private fun StructuralCard(background: Color, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(
         modifier = modifier
-            .shadow(0.dp, RoundedCornerShape(30.dp))
             .border(3.dp, Ink, RoundedCornerShape(30.dp))
             .background(background, RoundedCornerShape(30.dp)),
     ) { content() }
@@ -278,12 +348,7 @@ private fun StructuralCard(background: Color, modifier: Modifier = Modifier, con
 
 @Composable
 private fun DoseIdentityRail() {
-    Column(
-        modifier = Modifier
-            .width(34.dp)
-            .height(272.dp)
-            .border(0.dp, Ink)
-    ) {
+    Column(modifier = Modifier.width(34.dp).height(260.dp)) {
         listOf(TransBlue, TransPink, TransWhite, TransPink, TransBlue).forEach { color ->
             Box(Modifier.weight(1f).fillMaxWidth().background(color))
         }
@@ -303,11 +368,9 @@ private fun LabelText(text: String) {
 @Composable
 private fun TextButtonLabel(text: String, onClick: () -> Unit) {
     if (text.isBlank()) return
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Ink),
-        elevation = null,
-    ) { Text(text, fontWeight = FontWeight.Black, fontSize = 12.sp) }
+    Button(onClick = onClick, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Ink), elevation = null) {
+        Text(text, fontWeight = FontWeight.Black, fontSize = 12.sp)
+    }
 }
 
 @Composable
