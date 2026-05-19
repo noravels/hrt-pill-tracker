@@ -6,14 +6,14 @@ Implementation is not started by this document. It is a design handoff for a fut
 
 ## Selected direction
 
-Use `sketches/android/006-trans-flag-native/` as the Phase 1 baseline.
+Use `sketches/android/007-trans-structural-blocks/` as the Phase 1 baseline.
 
 It combines:
 
 - the next-dose-first structure from `001-calm-cards`
 - the routine clarity of `003-routine-timeline`
 - a minimal setup flow that keeps local-only usage first
-- a stronger Claude Design visual pass where the transgender pride flag becomes the app chrome, dose surface, navigation language, and screen rhythm
+- a non-gradient structural visual system where transgender pride colors become side rails, solid blocks, selected states, and dose-card structure instead of a top decoration
 
 ## Product tone
 

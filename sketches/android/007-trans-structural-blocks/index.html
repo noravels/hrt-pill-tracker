@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HRT Pill Tracker — Trans Structural Blocks</title>
+  <style>
+    :root {
+      --blue: #5BCEFA;
+      --pink: #F5A9B8;
+      --white: #FFFFFF;
+      --ink: #15171d;
+      --muted: #5d6068;
+      --paper: #fffdfb;
+      --line: #15171d;
+      --soft-blue: #dff6ff;
+      --soft-pink: #ffe6ec;
+      --shadow: 9px 9px 0 #15171d;
+      --mini-shadow: 4px 4px 0 #15171d;
+      --radius: 24px;
+      font-family: ui-rounded, "SF Pro Rounded", "Avenir Next", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [data-theme="dark"] {
+      --ink: #fbfcff;
+      --muted: #cfd6df;
+      --paper: #12151c;
+      --line: #fbfcff;
+      --soft-blue: #0f3444;
+      --soft-pink: #3f1f2a;
+      --shadow: 9px 9px 0 #fbfcff;
+      --mini-shadow: 4px 4px 0 #fbfcff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(90deg, var(--blue) 0 72px, transparent 72px calc(100% - 72px), var(--pink) calc(100% - 72px)),
+        repeating-linear-gradient(0deg, transparent 0 34px, rgba(21,23,29,.06) 34px 35px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    [data-theme="dark"] body::before { background:
+      linear-gradient(90deg, #123849 0 72px, transparent 72px calc(100% - 72px), #4a2230 calc(100% - 72px)),
+      repeating-linear-gradient(0deg, transparent 0 34px, rgba(255,255,255,.06) 34px 35px);
+    }
+    button { font: inherit; color: inherit; }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(260px, 330px) minmax(330px, 410px) minmax(250px, 310px);
+      gap: 34px;
+      align-items: center;
+      justify-content: center;
+      padding: 34px 98px;
+    }
+    .panel, .controls {
+      background: var(--paper);
+      border: 3px solid var(--line);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+    .flag-stack {
+      width: 106px;
+      height: 76px;
+      display: grid;
+      grid-template-rows: repeat(5, 1fr);
+      border: 3px solid var(--line);
+      box-shadow: var(--mini-shadow);
+      margin-bottom: 28px;
+      transform: rotate(-2deg);
+    }
+    .flag-stack span:nth-child(1), .flag-stack span:nth-child(5) { background: var(--blue); }
+    .flag-stack span:nth-child(2), .flag-stack span:nth-child(4) { background: var(--pink); }
+    .flag-stack span:nth-child(3) { background: var(--white); }
+    .kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .16em; font-weight: 1000; }
+    h1 { margin: 12px 0 14px; font-size: clamp(42px, 5vw, 62px); line-height: .88; letter-spacing: -.07em; max-width: 7ch; }
+    p { color: var(--muted); line-height: 1.45; font-size: 15px; margin: 0; font-weight: 650; }
+    .principles { display: grid; gap: 10px; margin-top: 22px; }
+    .principles div {
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      font-weight: 900;
+      background: var(--white);
+      color: #15171d;
+    }
+    .principles div:nth-child(1) { background: var(--blue); }
+    .principles div:nth-child(2) { background: var(--pink); }
+
+    .phone {
+      width: min(100%, 410px);
+      min-height: 842px;
+      background: #111;
+      border-radius: 48px;
+      padding: 12px;
+      box-shadow: 18px 18px 0 rgba(21,23,29,.34);
+    }
+    .screen {
+      position: relative;
+      min-height: 818px;
+      overflow: hidden;
+      border-radius: 38px;
+      background: var(--paper);
+      border: 0;
+      padding: 24px 18px 18px;
+    }
+    .screen::before, .screen::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 18px;
+      z-index: 0;
+    }
+    .screen::before { left: 0; background: var(--blue); }
+    .screen::after { right: 0; background: var(--pink); }
+    .screen > * { position: relative; z-index: 1; }
+    .home, .setup, .routine { display: grid; gap: 13px; }
+    .setup, .routine { display: none; }
+    .screen[data-view="setup"] .home, .screen[data-view="routine"] .home { display:none; }
+    .screen[data-view="setup"] .setup { display:grid; }
+    .screen[data-view="routine"] .routine { display:grid; }
+    .status { display:flex; justify-content:space-between; font-size:13px; font-weight:1000; padding: 0 6px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-top: 8px; }
+    .brand-title b { display:block; font-size:27px; line-height:1; letter-spacing:-.055em; }
+    .brand-title span { color: var(--muted); font-size:12px; font-weight:850; }
+    .icon-btn {
+      width: 48px; height: 48px;
+      border: 3px solid var(--line);
+      border-radius: 16px;
+      background: var(--white);
+      color: #15171d;
+      box-shadow: var(--mini-shadow);
+      cursor: pointer;
+      font-weight: 1000;
+    }
+    .dose-card {
+      margin-top: 10px;
+      border: 3px solid var(--line);
+      border-radius: 30px;
+      background: var(--white);
+      color: #15171d;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 34px 1fr;
+    }
+    .dose-rail {
+      display: grid;
+      grid-template-rows: 1fr 1fr .8fr 1fr 1fr;
+      border-right: 3px solid #15171d;
+    }
+    .dose-rail span:nth-child(1), .dose-rail span:nth-child(5) { background: var(--blue); }
+    .dose-rail span:nth-child(2), .dose-rail span:nth-child(4) { background: var(--pink); }
+    .dose-rail span:nth-child(3) { background: var(--white); }
+    .dose-content { padding: 18px; }
+    .label { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; font-weight: 1000; }
+    .time { font-size: 90px; line-height: .82; letter-spacing:-.09em; font-weight: 1000; font-variant-numeric: tabular-nums; margin: 8px 0 6px; }
+    .med { font-size: 24px; font-weight: 1000; letter-spacing:-.055em; }
+    .meta { color: #4d535f; font-size: 13px; font-weight: 780; margin-top: 3px; }
+    .primary {
+      width: 100%;
+      min-height: 58px;
+      margin-top: 16px;
+      border: 3px solid #15171d;
+      border-radius: 19px;
+      background: var(--blue);
+      color: #15171d;
+      font-weight: 1000;
+      font-size: 16px;
+      box-shadow: 4px 4px 0 #15171d;
+      cursor: pointer;
+    }
+    .primary.pink { background: var(--pink); }
+    .card {
+      border: 3px solid var(--line);
+      border-radius: 25px;
+      background: var(--paper);
+      padding: 15px;
+      box-shadow: 5px 5px 0 var(--line);
+    }
+    .card.blue { background: var(--soft-blue); }
+    .card.pink { background: var(--soft-pink); }
+    .card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+    .card-head b { font-size:17px; letter-spacing:-.04em; }
+    .card-head button { border:0; background:transparent; font-weight:1000; cursor:pointer; text-decoration: underline; }
+    .list { display:grid; gap:9px; }
+    .row {
+      display:grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 9px;
+      align-items:center;
+      border: 2px solid var(--line);
+      border-radius: 17px;
+      padding: 10px;
+      background: var(--paper);
+    }
+    .row time { font-weight:1000; font-size:13px; font-variant-numeric: tabular-nums; }
+    .row b { display:block; font-size:14px; }
+    .row span { display:block; color: var(--muted); font-weight:770; font-size:12px; }
+    .chip {
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: var(--white);
+      color: #15171d;
+      font-size: 12px;
+      font-weight: 1000;
+    }
+    .chip.blue { background: var(--blue); }
+    .chip.pink { background: var(--pink); }
+    .nav {
+      margin-top: 1px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      border: 3px solid var(--line);
+      border-radius: 24px;
+      padding: 7px;
+      background: var(--paper);
+      box-shadow: 5px 5px 0 var(--line);
+    }
+    .nav button {
+      min-height: 49px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      font-weight: 1000;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .nav button.active { background: var(--blue); color: #15171d; border: 2px solid #15171d; }
+    .form-title { margin: 12px 0 2px; font-size: 52px; line-height:.88; letter-spacing:-.075em; }
+    .field label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-weight:1000; margin-bottom:8px; }
+    .field div { border:2px solid var(--line); border-radius:17px; padding: 15px 13px; background: var(--paper); font-weight:900; }
+    .toast {
+      display:none;
+      position:absolute;
+      left: 34px; right:34px; bottom:104px;
+      border:3px solid #15171d;
+      border-radius:19px;
+      background: var(--pink);
+      color:#15171d;
+      min-height:58px;
+      align-items:center; justify-content:center;
+      font-weight:1000;
+      box-shadow: 5px 5px 0 #15171d;
+      z-index: 5;
+    }
+    .toast.show { display:flex; }
+    .controls h2 { margin: 10px 0 12px; font-size: 36px; line-height:.95; letter-spacing:-.065em; }
+    .control-list { display:grid; gap:10px; margin-top:20px; }
+    .control-list button, .theme button {
+      border:3px solid var(--line);
+      border-radius:19px;
+      padding: 13px;
+      background: var(--paper);
+      box-shadow: var(--mini-shadow);
+      font-weight: 1000;
+      cursor:pointer;
+      text-align:left;
+    }
+    .control-list button.active { background: var(--pink); color:#15171d; }
+    .theme { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+    .theme button { text-align:center; }
+    .theme button.active { background: var(--blue); color:#15171d; }
+
+    @media (max-width: 1120px) {
+      .wrap { grid-template-columns: minmax(330px, 410px); padding: 24px 84px; }
+      .panel, .controls { width:min(100%,410px); justify-self:center; }
+      .phone { justify-self:center; }
+    }
+    @media (max-width: 520px) {
+      body::before { display:none; }
+      .wrap { padding:0; display:block; }
+      .panel, .controls { display:none; }
+      .phone { width:100%; min-height:100vh; border-radius:0; padding:0; box-shadow:none; }
+      .screen { min-height:100vh; border-radius:0; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <main class="wrap">
+    <aside class="panel">
+      <div class="flag-stack"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="kicker">trans, structurally</div>
+      <h1>not a gradient skin.</h1>
+      <p>Bu revizyon bayrak renklerini üstte bir gradient veya şerit olarak değil, uygulamanın iskeleti olarak kullanıyor: yan raylar, bloklar, seçili state’ler, form ritmi ve doz kartının kendi yapısı.</p>
+      <div class="principles">
+        <div>#5BCEFA = primary action / left rail</div>
+        <div>#F5A9B8 = routine / selected state</div>
+        <div>#FFFFFF = breathing room / dose clarity</div>
+      </div>
+    </aside>
+
+    <section class="phone">
+      <div class="screen" id="screen" data-view="home">
+        <div class="toast" id="toast">Taken · next dose moved to 09:00</div>
+        <div class="home">
+          <div class="status"><span>20:42</span><span>local only</span></div>
+          <div class="topbar">
+            <div class="brand-title"><b>Today</b><span>HRT routine · on device</span></div>
+            <button class="icon-btn" data-view="setup">set</button>
+          </div>
+          <section class="dose-card">
+            <div class="dose-rail" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="dose-content">
+              <div class="label">next dose</div>
+              <div class="time">21:00</div>
+              <div class="med">Estradiol · 2 mg</div>
+              <div class="meta">sublingual · every 12 hours · gentle reminder</div>
+              <button class="primary" id="markTaken">Mark dose taken</button>
+            </div>
+          </section>
+          <section class="card blue">
+            <div class="card-head"><b>Active routine</b><button data-view="setup">edit</button></div>
+            <div class="list">
+              <div class="row"><time>09/21</time><div><b>Estradiol</b><span>fixed anchor schedule</span></div><i class="chip blue">2×</i></div>
+              <div class="row"><time>Fri</time><div><b>Blocker</b><span>optional; can be hidden</span></div><i class="chip pink">opt</i></div>
+            </div>
+          </section>
+          <section class="card pink">
+            <div class="card-head"><b>Next 24 hours</b><button data-view="routine">all</button></div>
+            <div class="list">
+              <div class="row"><time>21:00</time><div><b>Take window</b><span>shown without guilt language</span></div><i class="chip blue">now</i></div>
+              <div class="row"><time>09:00</time><div><b>Tomorrow</b><span>next anchor stays predictable</span></div><i class="chip">next</i></div>
+            </div>
+          </section>
+          <nav class="nav">
+            <button class="active" data-view="home">Today</button>
+            <button data-view="routine">Routine</button>
+            <button>History</button>
+            <button data-view="setup">Setup</button>
+          </nav>
+        </div>
+
+        <div class="setup">
+          <div class="status"><span>20:42</span><span>setup</span></div>
+          <div class="topbar"><button class="icon-btn" data-view="home">back</button><div class="brand-title"><b>Setup</b><span>no account</span></div></div>
+          <h2 class="form-title">build your routine.</h2>
+          <section class="card blue field"><label>medication</label><div>Estradiol</div></section>
+          <section class="card pink field"><label>dose</label><div>2 mg · sublingual</div></section>
+          <section class="card field"><label>interval</label><div>every 12 hours · anchor 09:00</div></section>
+          <section class="card blue field"><label>privacy</label><div>stored locally on this phone</div></section>
+          <button class="primary pink" data-view="home">Save local routine</button>
+        </div>
+
+        <div class="routine">
+          <div class="status"><span>20:42</span><span>routine</span></div>
+          <div class="topbar"><button class="icon-btn" data-view="home">back</button><div class="brand-title"><b>Routine</b><span>week at a glance</span></div></div>
+          <section class="card blue">
+            <div class="card-head"><b>Fixed anchors</b><span class="chip pink">no streaks</span></div>
+            <div class="list">
+              <div class="row"><time>Daily</time><div><b>09:00 · 21:00</b><span>Estradiol reminders</span></div><i class="chip blue">on</i></div>
+              <div class="row"><time>Fri</time><div><b>21:00</b><span>optional blocker reminder</span></div><i class="chip pink">opt</i></div>
+              <div class="row"><time>Any</time><div><b>Missed window</b><span>record it; no punishment copy</span></div><i class="chip">log</i></div>
+            </div>
+          </section>
+          <section class="card pink field"><label>phase 1 rule</label><div>local only · no Google backup yet</div></section>
+          <nav class="nav"><button data-view="home">Today</button><button class="active" data-view="routine">Routine</button><button>History</button><button data-view="setup">Setup</button></nav>
+        </div>
+      </div>
+    </section>
+
+    <aside class="controls">
+      <div class="kicker">prototype controls</div>
+      <h2>flat blocks, not wash.</h2>
+      <p>Bu seçenek trans bayrağını decorative gradient yerine layout sistemi olarak dener. Daha grafik, daha native’e çevrilebilir, daha az “AI wellness card”.</p>
+      <div class="control-list">
+        <button class="active" data-view="home">Today / dose action</button>
+        <button data-view="setup">Setup / local routine</button>
+        <button data-view="routine">Routine / schedule</button>
+      </div>
+      <div class="theme"><button class="active" id="light">Light</button><button id="dark">Dark</button></div>
+    </aside>
+  </main>
+  <script>
+    const body = document.body;
+    const screen = document.getElementById('screen');
+    const toast = document.getElementById('toast');
+    const markTaken = document.getElementById('markTaken');
+    const light = document.getElementById('light');
+    const dark = document.getElementById('dark');
+    function setView(view){
+      screen.dataset.view = view;
+      document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view && b.closest('.control-list')));
+    }
+    function setTheme(t){
+      body.dataset.theme = t;
+      light.classList.toggle('active', t === 'light');
+      dark.classList.toggle('active', t === 'dark');
+      localStorage.setItem('hrt-structural-theme', t);
+    }
+    document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+    light.addEventListener('click', () => setTheme('light'));
+    dark.addEventListener('click', () => setTheme('dark'));
+    markTaken.addEventListener('click', () => {
+      markTaken.textContent = 'Taken · next at 09:00';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    });
+    setTheme(localStorage.getItem('hrt-structural-theme') || 'light');
+  </script>
+</body>
+</html>
