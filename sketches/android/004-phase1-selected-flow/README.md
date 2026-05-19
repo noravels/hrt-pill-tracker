@@ -7,7 +7,7 @@ This is the proposed Android Phase 1 direction: calm card-based home screen, gui
 ## Key choices
 
 - Layout: mobile Android frame with separate Home, Setup, Routine, and Settings screens.
-- Visual tone: warm neutral surfaces, soft purple accent, calm medical-tracker feel without looking clinical or childish.
+- Visual tone: trans-flag-inspired palette (soft blue, pink, white) with calm medical-tracker restraint; identity-aware without looking loud, clinical, or childish.
 - Primary action: the home hero makes “Mark dose taken” the clearest action.
 - Privacy: local-only mode is visible but not alarmist.
 - Optionality: T-blocker is represented as optional, so estrogen-only routines do not look like an error.

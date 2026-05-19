@@ -6,42 +6,50 @@
   <title>HRT Pill Tracker — Android Phase 1 Design</title>
   <style>
     :root {
-      --bg: #f6f2ee;
-      --surface: #fffaf6;
-      --surface-2: #f0e7df;
-      --ink: #211b18;
-      --muted: #70655f;
-      --line: #e6d8ce;
-      --accent: #8f5bff;
+      /* Trans flag base: blue #5BCEFA, pink #F5A9B8, white #FFFFFF. */
+      --trans-blue: #5BCEFA;
+      --trans-pink: #F5A9B8;
+      --trans-white: #FFFFFF;
+      --bg: #f7fbff;
+      --surface: #ffffff;
+      --surface-2: #eef8fd;
+      --ink: #18242c;
+      --muted: #4f6570;
+      --line: #d6e8f0;
+      --accent: #1785b6;
       --accent-ink: #ffffff;
-      --accent-soft: #eee6ff;
-      --ok: #167a57;
-      --ok-soft: #e5f5ee;
-      --warn: #9a5d00;
-      --warn-soft: #fff3d8;
-      --panel-bg: rgba(255, 250, 246, 0.88);
-      --panel-border: rgba(230, 216, 206, 0.85);
-      --nav-bg: #fffdfb;
-      --screen-bg: #fbf7f3;
-      --screen-border: rgba(31, 24, 19, 0.08);
-      --status-ink: #3b332e;
-      --button-soft: #efe6dd;
-      --gray-soft: #eee8e3;
-      --gray-ink: #796e66;
-      --pill-bg: #f1ece7;
-      --pill-ink: #675b53;
-      --bottom-bg: rgba(255,250,246,.92);
-      --input-bg: #fbf7f3;
-      --note-bg: #fff6df;
-      --note-ink: #6f4a05;
-      --event-bg: #fffdfb;
+      --accent-soft: #e2f6ff;
+      --ok: #157a88;
+      --ok-soft: #e0f8fb;
+      --warn: #b04d6a;
+      --warn-soft: #fff0f4;
+      --panel-bg: rgba(255, 255, 255, 0.90);
+      --panel-border: rgba(214, 232, 240, 0.95);
+      --nav-bg: #ffffff;
+      --screen-bg: #f7fbff;
+      --screen-border: rgba(24, 36, 44, 0.08);
+      --status-ink: #23343d;
+      --button-soft: #eaf7fc;
+      --gray-soft: #edf3f6;
+      --gray-ink: #5d6e78;
+      --pill-bg: #fceaf0;
+      --pill-ink: #783248;
+      --bottom-bg: rgba(255,255,255,.94);
+      --input-bg: #f8fcff;
+      --note-bg: #fff3f6;
+      --note-ink: #93435a;
+      --event-bg: #ffffff;
       --marker-bg: #ffffff;
-      --toast-bg: #211b18;
+      --toast-bg: #17242c;
       --toast-ink: #ffffff;
-      --primary-ink: #4a29a6;
-      --hero-bg: linear-gradient(145deg, #2d223b, #6f45d8);
-      --hero-shadow: 0 18px 42px rgba(88, 54, 178, 0.35);
-      --shadow: 0 24px 60px rgba(55, 39, 28, 0.18);
+      --primary-ink: #0d5f86;
+      --hero-bg: linear-gradient(145deg, #5BCEFA 0%, #ffffff 48%, #F5A9B8 100%);
+      --hero-ink: #14323f;
+      --hero-muted: rgba(20, 50, 63, .72);
+      --hero-shadow: 0 18px 42px rgba(91, 206, 250, 0.24), 0 10px 28px rgba(245, 169, 184, 0.22);
+      --glow-a: rgba(91, 206, 250, 0.24);
+      --glow-b: rgba(245, 169, 184, 0.22);
+      --shadow: 0 24px 60px rgba(44, 75, 92, 0.16);
       --radius-xl: 30px;
       --radius-lg: 22px;
       --radius-md: 16px;
@@ -49,41 +57,45 @@
     }
 
     [data-theme="dark"] {
-      --bg: #11100f;
-      --surface: #1d1a18;
-      --surface-2: #26211f;
-      --ink: #f8eee7;
-      --muted: #cabcaf;
-      --line: #3a322d;
-      --accent: #b79aff;
-      --accent-soft: #302447;
-      --ok: #72d6ad;
-      --ok-soft: #173529;
-      --warn: #f4bf64;
-      --warn-soft: #3d2b10;
-      --panel-bg: rgba(29, 26, 24, 0.9);
-      --panel-border: rgba(67, 56, 49, 0.9);
-      --nav-bg: #211d1a;
-      --screen-bg: #171514;
-      --screen-border: rgba(255, 245, 238, 0.08);
-      --status-ink: #e7d9cf;
-      --button-soft: #2b2521;
-      --gray-soft: #2b2724;
-      --gray-ink: #c7b8ae;
-      --pill-bg: #29231f;
-      --pill-ink: #dacdc3;
-      --bottom-bg: rgba(29, 26, 24, .94);
-      --input-bg: #161312;
-      --note-bg: #372814;
-      --note-ink: #f1ca82;
-      --event-bg: #211d1a;
-      --marker-bg: #211d1a;
-      --toast-bg: #f8eee7;
-      --toast-ink: #171514;
-      --primary-ink: #f4ecff;
-      --hero-bg: linear-gradient(145deg, #17111f, #6e4bdd);
-      --hero-shadow: 0 18px 42px rgba(95, 72, 180, 0.30);
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --bg: #0d1216;
+      --surface: #151d22;
+      --surface-2: #1b2730;
+      --ink: #f6fbff;
+      --muted: #bfd0d9;
+      --line: #2a3a43;
+      --accent: #77d8fb;
+      --accent-soft: #153747;
+      --ok: #8ae6f5;
+      --ok-soft: #14333a;
+      --warn: #ffbfd0;
+      --warn-soft: #3a1f28;
+      --panel-bg: rgba(21, 29, 34, 0.92);
+      --panel-border: rgba(58, 78, 88, 0.85);
+      --nav-bg: #182229;
+      --screen-bg: #10171b;
+      --screen-border: rgba(255, 255, 255, 0.08);
+      --status-ink: #e5f6ff;
+      --button-soft: #21313a;
+      --gray-soft: #24313a;
+      --gray-ink: #d3e2ea;
+      --pill-bg: #3a222b;
+      --pill-ink: #ffc8d6;
+      --bottom-bg: rgba(21, 29, 34, .95);
+      --input-bg: #0f171c;
+      --note-bg: #351d26;
+      --note-ink: #ffc9d7;
+      --event-bg: #182229;
+      --marker-bg: #182229;
+      --toast-bg: #f6fbff;
+      --toast-ink: #10171b;
+      --primary-ink: #e8f9ff;
+      --hero-bg: linear-gradient(145deg, #174153 0%, #26313a 46%, #5b2c3d 100%);
+      --hero-ink: #ffffff;
+      --hero-muted: rgba(255, 255, 255, .76);
+      --hero-shadow: 0 18px 42px rgba(91, 206, 250, 0.12), 0 10px 28px rgba(245, 169, 184, 0.12);
+      --glow-a: rgba(91, 206, 250, 0.13);
+      --glow-b: rgba(245, 169, 184, 0.12);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
     }
 
     * { box-sizing: border-box; }
@@ -92,8 +104,8 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at 20% 0%, rgba(143, 91, 255, 0.18), transparent 30%),
-        radial-gradient(circle at 80% 10%, rgba(22, 122, 87, 0.12), transparent 26%),
+        radial-gradient(circle at 20% 0%, var(--glow-a), transparent 30%),
+        radial-gradient(circle at 80% 10%, var(--glow-b), transparent 26%),
         var(--bg);
       display: flex;
       justify-content: center;
@@ -218,13 +230,13 @@
       padding: 22px;
       border-radius: 28px;
       background: var(--hero-bg);
-      color: white;
+      color: var(--hero-ink);
       box-shadow: var(--hero-shadow);
     }
     .hero .label { opacity: 0.72; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; }
     .hero .time { margin-top: 8px; font-size: 42px; font-weight: 820; letter-spacing: -0.06em; }
     .hero .med { margin-top: 4px; font-size: 18px; font-weight: 760; }
-    .hero .meta { margin-top: 8px; color: rgba(255,255,255,.76); font-size: 13px; }
+    .hero .meta { margin-top: 8px; color: var(--hero-muted); font-size: 13px; }
     .primary {
       margin-top: 18px;
       width: 100%;

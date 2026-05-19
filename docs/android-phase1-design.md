@@ -26,6 +26,8 @@ The app should feel:
 - not clinical
 - not childish
 
+The palette should be based on the transgender pride flag colors: soft blue, soft pink, and white. The colors should be used with restraint so the app feels identity-aware, calm, and trustworthy rather than loud or novelty-themed.
+
 The app should not feel like a generic habit game. It is a sensitive medication tracker, so the design should avoid streak pressure, guilt language, or gamified punishment.
 
 ## Phase 1 screens
@@ -121,13 +123,15 @@ For Phase 1, History may be minimal or read-only. It can show taken dose events 
 
 ### Colors
 
-- Background: warm off-white / beige in light mode; near-black warm charcoal in dark mode
-- Surface: near-white cards in light mode; elevated warm charcoal cards in dark mode
-- Accent: soft purple
-- Success: muted green
-- Warning: warm amber
-- Text: dark warm brown/black in light mode; warm off-white in dark mode
-- Dividers: light warm gray in light mode; low-contrast warm gray in dark mode
+- Palette basis: transgender pride flag colors — blue `#5BCEFA`, pink `#F5A9B8`, and white `#FFFFFF`
+- Background: pale trans-blue/white wash in light mode; near-black blue-charcoal in dark mode
+- Surface: white cards in light mode; elevated blue-charcoal cards in dark mode
+- Accent: accessibility-adjusted trans blue for primary controls
+- Secondary accent: trans pink for pills, notes, and warm highlights
+- Success/reminder: teal-blue derived from the trans-blue family
+- Warning/attention: muted pink rather than harsh red/orange
+- Text: dark blue-charcoal in light mode; warm off-white in dark mode
+- Dividers: pale blue-gray in light mode; low-contrast blue-gray in dark mode
 
 ### Shape
 
@@ -139,7 +143,7 @@ For Phase 1, History may be minimal or read-only. It can show taken dose events 
 ### Typography
 
 - Android native Material typography is fine.
-- Support light and dark mode from Phase 1; dark mode should be calm charcoal, not pure black.
+- Support light and dark mode from Phase 1; dark mode should be calm blue-charcoal, not pure black.
 - Emphasize large next-dose time.
 - Use concise labels and avoid medical advice wording.
 
