@@ -11,6 +11,7 @@ Three disposable HTML mockups explore Android phase 1 directions for the HRT pil
 | [003 Routine Timeline](003-routine-timeline/) | Chronological routine view with expandable reminder sheet | Best sense of daily progress; optional meds are naturally represented | More custom; timeline may be heavier to implement cleanly |
 | [004 Phase 1 Selected Flow](004-phase1-selected-flow/) | Consolidated proposed Phase 1 design with Home, Setup, Routine, Settings and visible trans-flag theme | Best implementation handoff; combines calm cards with guided setup, timeline, and explicit brand palette | Less exploratory; assumes the 001 direction as baseline |
 | [005 Subtle Trans Palette](005-subtle-trans-palette/) | Preserved previous revision with softer trans-flag-inspired colors | Useful rollback/reference if the stronger theme feels too bold | Less visibly “main theme is trans” than requested |
+| [006 Trans Flag Native](006-trans-flag-native/) | Stronger Claude Design pass where the trans flag becomes the app chrome, dose surface, navigation language, and visual structure | Least generic; clearest trans identity; best current direction | Bolder visual system to translate carefully into native Compose |
 
 ## Shared requirements covered
 
@@ -26,8 +27,8 @@ Three disposable HTML mockups explore Android phase 1 directions for the HRT pil
 
 ## Recommendation
 
-Use 004 Phase 1 Selected Flow as the Android implementation handoff. It consolidates the recommended 001 Calm Cards direction into a concrete Phase 1 flow: Home, Setup, Routine, and Settings, with the trans flag palette as the primary visual identity.
+Use 006 Trans Flag Native as the current Android implementation handoff. It is the strongest response to the “too generic / too subtle” feedback: the trans flag becomes the app chrome, dose surface, navigation language, and visual structure while preserving Phase 1 scope.
 
-005 Subtle Trans Palette is the saved prior revision if a softer direction is needed later.
+004 Phase 1 Selected Flow remains a previous selected-flow reference, and 005 Subtle Trans Palette is the saved softer revision if a less flag-forward direction is needed later.
 
 001 Calm Cards remains the baseline structural language. Borrow selectively from 002 Compact Schedule for the schedule list and reminder tab if users ask for denser daily planning. Borrow from 003 Routine Timeline if the app later needs a more habit/routine-oriented daily progress view.

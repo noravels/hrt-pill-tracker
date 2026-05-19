@@ -6,13 +6,14 @@ Implementation is not started by this document. It is a design handoff for a fut
 
 ## Selected direction
 
-Use `sketches/android/004-phase1-selected-flow/` as the Phase 1 baseline.
+Use `sketches/android/006-trans-flag-native/` as the Phase 1 baseline.
 
 It combines:
 
-- the calm, spacious home screen from `001-calm-cards`
+- the next-dose-first structure from `001-calm-cards`
 - the routine clarity of `003-routine-timeline`
 - a minimal setup flow that keeps local-only usage first
+- a stronger Claude Design visual pass where the transgender pride flag becomes the app chrome, dose surface, navigation language, and screen rhythm
 
 ## Product tone
 
@@ -28,7 +29,7 @@ The app should feel:
 
 The palette should use the transgender pride flag as the main theme, not merely a subtle accent. Use the commonly listed flag colors from Wikipedia: light blue `#5BCEFA`, pink `#F5A9B8`, and white `#FFFFFF`. The UI should show recognizable flag bands/ribbons in key surfaces while preserving health-tracker readability and avoiding guilt/gamified language.
 
-The earlier subtle trans-palette revision is preserved separately at `sketches/android/005-subtle-trans-palette/`.
+The earlier subtle trans-palette revision is preserved separately at `sketches/android/005-subtle-trans-palette/`. The previous selected flow remains at `sketches/android/004-phase1-selected-flow/`.
 
 The app should not feel like a generic habit game. It is a sensitive medication tracker, so the design should avoid streak pressure, guilt language, or gamified punishment.
 

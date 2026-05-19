@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HRT Pill Tracker — Trans Flag Native Design</title>
+  <style>
+    :root {
+      --flag-blue: #5BCEFA;
+      --flag-pink: #F5A9B8;
+      --flag-white: #FFFFFF;
+      --ink: #11151d;
+      --muted: #53616d;
+      --paper: #ffffff;
+      --paper-2: #f8fbff;
+      --line: rgba(17, 21, 29, .13);
+      --shadow: 0 28px 80px rgba(31, 77, 108, .22);
+      --shadow-tight: 0 14px 36px rgba(31, 77, 108, .18);
+      --phone-bg:
+        radial-gradient(circle at 16% 9%, rgba(91,206,250,.95) 0 9%, transparent 24%),
+        radial-gradient(circle at 86% 5%, rgba(245,169,184,.9) 0 10%, transparent 25%),
+        linear-gradient(180deg, #ffffff 0%, #eefaff 42%, #fff2f6 100%);
+      --chrome: rgba(255,255,255,.78);
+      --chrome-strong: rgba(255,255,255,.92);
+      --active: #11151d;
+      --active-ink: #ffffff;
+      --danger: #b32848;
+      --ok: #05735d;
+      --radius-xl: 34px;
+      --radius-l: 26px;
+      --radius-m: 18px;
+      font-family: ui-rounded, "SF Pro Rounded", "Avenir Next", "Nunito Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --ink: #f8fbff;
+      --muted: #c0d2dd;
+      --paper: #101923;
+      --paper-2: #132636;
+      --line: rgba(255,255,255,.16);
+      --shadow: 0 30px 90px rgba(0,0,0,.55);
+      --shadow-tight: 0 16px 42px rgba(0,0,0,.42);
+      --phone-bg:
+        radial-gradient(circle at 16% 9%, rgba(91,206,250,.7) 0 9%, transparent 25%),
+        radial-gradient(circle at 86% 5%, rgba(245,169,184,.7) 0 10%, transparent 25%),
+        linear-gradient(180deg, #07111a 0%, #0d2535 48%, #2b1520 100%);
+      --chrome: rgba(11,22,32,.78);
+      --chrome-strong: rgba(15,26,37,.94);
+      --active: #ffffff;
+      --active-ink: #11151d;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        linear-gradient(90deg,
+          var(--flag-blue) 0 20%,
+          var(--flag-pink) 20% 40%,
+          var(--flag-white) 40% 60%,
+          var(--flag-pink) 60% 80%,
+          var(--flag-blue) 80% 100%);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.24) 36%, rgba(255,255,255,.58)),
+        repeating-linear-gradient(135deg, rgba(255,255,255,.24) 0 2px, transparent 2px 22px);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+    [data-theme="dark"] body::before,
+    body[data-theme="dark"]::before {
+      background:
+        linear-gradient(180deg, rgba(3,8,14,.52), rgba(3,8,14,.2) 36%, rgba(3,8,14,.62)),
+        repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 1px, transparent 1px 24px);
+      mix-blend-mode: normal;
+    }
+
+    button { font: inherit; }
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(320px, 420px) minmax(260px, 340px);
+      gap: 24px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brief, .tweaks {
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(255,255,255,.78);
+      border-radius: 34px;
+      padding: 24px;
+      box-shadow: var(--shadow-tight);
+      backdrop-filter: blur(26px) saturate(1.2);
+    }
+    [data-theme="dark"] .brief, [data-theme="dark"] .tweaks {
+      background: rgba(9,18,28,.72);
+      border-color: rgba(255,255,255,.14);
+    }
+
+    .flag-mark {
+      width: 86px;
+      height: 54px;
+      border-radius: 14px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: repeat(5, 1fr);
+      box-shadow: 0 14px 30px rgba(31,77,108,.25);
+      transform: rotate(-4deg);
+      margin-bottom: 28px;
+    }
+    .flag-mark span:nth-child(1), .flag-mark span:nth-child(5) { background: var(--flag-blue); }
+    .flag-mark span:nth-child(2), .flag-mark span:nth-child(4) { background: var(--flag-pink); }
+    .flag-mark span:nth-child(3) { background: var(--flag-white); }
+
+    .eyebrow {
+      font-size: 11px;
+      line-height: 1;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    h1 {
+      margin: 14px 0 14px;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: .88;
+      letter-spacing: -.06em;
+      max-width: 8ch;
+    }
+    .brief p, .tweaks p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.48;
+      font-size: 15px;
+    }
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .swatch {
+      min-height: 70px;
+      border-radius: 20px;
+      padding: 10px;
+      display: flex;
+      align-items: end;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      color: #11151d;
+      box-shadow: inset 0 0 0 1px rgba(17,21,29,.12);
+    }
+    .blue { background: var(--flag-blue); }
+    .pink { background: var(--flag-pink); }
+    .white { background: var(--flag-white); }
+
+    .phone {
+      width: min(100%, 410px);
+      min-height: 840px;
+      border-radius: 48px;
+      padding: 12px;
+      background: #11151d;
+      box-shadow: 0 42px 110px rgba(9, 27, 41, .42);
+      position: relative;
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      translate: -50% 0;
+      width: 96px;
+      height: 28px;
+      background: #11151d;
+      border-radius: 0 0 20px 20px;
+      z-index: 5;
+    }
+    .screen {
+      min-height: 816px;
+      border-radius: 38px;
+      overflow: hidden;
+      background: var(--phone-bg);
+      position: relative;
+      padding: 28px 20px 18px;
+    }
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg,
+          rgba(91,206,250,.9) 0 20%,
+          rgba(245,169,184,.9) 20% 40%,
+          rgba(255,255,255,.9) 40% 60%,
+          rgba(245,169,184,.9) 60% 80%,
+          rgba(91,206,250,.9) 80% 100%);
+      height: 10px;
+      z-index: 1;
+    }
+    .screen-grid { position: relative; z-index: 2; display: grid; gap: 14px; }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 4px 2px;
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .dots { display:flex; gap:4px; align-items:center; }
+    .dots i { width: 6px; height:6px; border-radius:50%; background: var(--ink); opacity:.8; display:block; }
+
+    .topbar {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-stack b { display:block; font-size: 24px; letter-spacing: -.05em; line-height: 1; }
+    .title-stack span { color: var(--muted); font-weight: 740; font-size: 13px; }
+    .round-btn {
+      width: 48px;
+      height: 48px;
+      border: 0;
+      border-radius: 18px;
+      color: var(--ink);
+      background: var(--chrome-strong);
+      box-shadow: 0 8px 22px rgba(38,74,97,.12);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .hero-dose {
+      margin-top: 10px;
+      border-radius: 32px;
+      padding: 16px;
+      color: #11151d;
+      background:
+        linear-gradient(180deg,
+          var(--flag-blue) 0 19%,
+          var(--flag-pink) 19% 38%,
+          var(--flag-white) 38% 62%,
+          var(--flag-pink) 62% 81%,
+          var(--flag-blue) 81% 100%);
+      box-shadow: 0 26px 64px rgba(31,77,108,.34);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-dose::after {
+      content: "";
+      position: absolute;
+      inset: -40% -20% auto auto;
+      width: 220px;
+      height: 220px;
+      background: rgba(255,255,255,.4);
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+    .dose-panel {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 26px;
+      padding: 18px;
+      backdrop-filter: blur(12px) saturate(1.1);
+    }
+    .dose-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+    .dose-label { font-size: 11px; text-transform: uppercase; letter-spacing:.16em; font-weight: 1000; }
+    .dose-time { margin: 8px 0 0; font-size: 82px; line-height:.82; letter-spacing:-.08em; font-weight: 1000; font-variant-numeric: tabular-nums; }
+    .dose-med { font-size: 23px; font-weight: 1000; letter-spacing:-.05em; }
+    .dose-meta { color: rgba(17,21,29,.68); font-size: 13px; font-weight: 780; margin-top: 4px; }
+    .spark {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, var(--flag-white) 0 22%, transparent 23%),
+        conic-gradient(from -90deg, var(--flag-blue), var(--flag-pink), var(--flag-white), var(--flag-pink), var(--flag-blue));
+      box-shadow: inset 0 0 0 8px rgba(255,255,255,.42);
+    }
+    .primary {
+      margin-top: 16px;
+      width: 100%;
+      min-height: 56px;
+      border: 0;
+      border-radius: 20px;
+      background: #11151d;
+      color: white;
+      font-size: 16px;
+      font-weight: 1000;
+      letter-spacing: -.02em;
+      cursor: pointer;
+      box-shadow: 0 16px 34px rgba(17,21,29,.22);
+    }
+
+    .flag-card {
+      background: var(--chrome-strong);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 28px;
+      padding: 16px;
+      box-shadow: 0 16px 40px rgba(31,77,108,.12);
+      backdrop-filter: blur(18px) saturate(1.1);
+    }
+    [data-theme="dark"] .flag-card { border-color: rgba(255,255,255,.13); }
+    .card-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom: 12px; }
+    .card-head b { font-size: 17px; letter-spacing:-.04em; }
+    .card-head button { border:0; background:transparent; color: var(--ink); font-weight:950; cursor:pointer; }
+    .mini-flag {
+      width: 58px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--flag-blue) 0 20%, var(--flag-pink) 20% 40%, var(--flag-white) 40% 60%, var(--flag-pink) 60% 80%, var(--flag-blue) 80% 100%);
+    }
+    .routine { display:grid; grid-template-columns: 1fr auto; gap: 10px; align-items:center; }
+    .routine strong { font-size: 15px; letter-spacing:-.03em; }
+    .routine span { color: var(--muted); font-size: 12px; font-weight: 760; }
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 11px;
+      background: linear-gradient(90deg, rgba(91,206,250,.36), rgba(245,169,184,.36));
+      font-size: 12px;
+      font-weight: 980;
+      color: var(--ink);
+    }
+
+    .timeline { display:grid; gap:10px; }
+    .event {
+      display:grid;
+      grid-template-columns: 58px 1fr auto;
+      align-items:center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.54);
+      border: 1px solid rgba(255,255,255,.58);
+    }
+    [data-theme="dark"] .event { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.1); }
+    .event time { font-size: 13px; font-weight: 1000; font-variant-numeric: tabular-nums; }
+    .event b { display:block; font-size: 14px; letter-spacing:-.03em; }
+    .event span { color: var(--muted); font-size: 12px; font-weight: 740; }
+    .badge { width: 16px; height:16px; border-radius:50%; background: var(--flag-blue); box-shadow: 0 0 0 5px rgba(91,206,250,.18); }
+    .badge.pink { background: var(--flag-pink); box-shadow: 0 0 0 5px rgba(245,169,184,.22); }
+    .badge.white { background: var(--flag-white); box-shadow: inset 0 0 0 1px rgba(17,21,29,.16), 0 0 0 5px rgba(255,255,255,.45); }
+
+    .nav {
+      margin-top: 2px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--chrome-strong);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 26px;
+      padding: 8px;
+      gap: 4px;
+      backdrop-filter: blur(18px);
+    }
+    [data-theme="dark"] .nav { border-color: rgba(255,255,255,.12); }
+    .nav button {
+      min-height: 50px;
+      border:0;
+      border-radius: 19px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 920;
+      cursor:pointer;
+    }
+    .nav button.active {
+      background:
+        linear-gradient(90deg, rgba(91,206,250,.95), rgba(245,169,184,.95));
+      color: #11151d;
+      box-shadow: 0 10px 22px rgba(31,77,108,.18);
+    }
+
+    .tweaks { align-self: center; }
+    .option-grid { display:grid; gap: 10px; margin-top: 18px; }
+    .option {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,.48);
+      color: var(--ink);
+      padding: 14px;
+      text-align: left;
+      cursor:pointer;
+    }
+    [data-theme="dark"] .option { background: rgba(255,255,255,.06); }
+    .option.active { background: linear-gradient(90deg, rgba(91,206,250,.72), rgba(245,169,184,.72)); color:#11151d; border-color: rgba(255,255,255,.8); }
+    .option b { display:block; font-size: 14px; margin-bottom: 3px; }
+    .option span { color: inherit; opacity:.72; font-size: 12px; font-weight:760; }
+    .theme-toggle { display:flex; gap:8px; margin-top:20px; }
+    .theme-toggle button {
+      flex:1;
+      min-height:44px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color: var(--ink);
+      background: rgba(255,255,255,.48);
+      font-weight: 950;
+      cursor:pointer;
+    }
+    [data-theme="dark"] .theme-toggle button { background: rgba(255,255,255,.06); }
+    .theme-toggle button.active { background: var(--active); color: var(--active-ink); }
+
+    .setup-screen, .timeline-screen { display: none; }
+    .screen[data-view="setup"] .home-screen,
+    .screen[data-view="timeline"] .home-screen { display: none; }
+    .screen[data-view="setup"] .setup-screen { display: grid; }
+    .screen[data-view="timeline"] .timeline-screen { display: grid; }
+    .setup-title { margin-top: 12px; font-size: 44px; line-height:.92; letter-spacing:-.07em; max-width: 8ch; }
+    .input-card label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-weight:1000; margin-bottom:8px; }
+    .input-card div { min-height:52px; border-radius:18px; border:1px solid var(--line); display:flex; align-items:center; padding:0 14px; font-weight:850; background: rgba(255,255,255,.48); }
+    [data-theme="dark"] .input-card div { background: rgba(255,255,255,.06); }
+
+    .toast {
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 104px;
+      min-height: 56px;
+      border-radius: 21px;
+      background: #11151d;
+      color: white;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      font-weight: 950;
+      box-shadow: 0 22px 44px rgba(17,21,29,.34);
+      z-index: 10;
+    }
+    .toast.show { display:flex; animation: pop .22s ease-out; }
+    @keyframes pop { from { transform: translateY(12px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+
+    @media (max-width: 1080px) {
+      .page { grid-template-columns: minmax(320px, 420px); padding: 18px; }
+      .brief, .tweaks { width: min(100%, 420px); justify-self:center; }
+      .phone { justify-self:center; }
+    }
+    @media (max-width: 460px) {
+      .page { padding: 0; display:block; }
+      .brief, .tweaks { display:none; }
+      .phone { width:100%; min-height:100vh; border-radius:0; padding:0; background:transparent; box-shadow:none; }
+      .phone::before { display:none; }
+      .screen { min-height:100vh; border-radius:0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <main class="page">
+    <aside class="brief" aria-label="Design brief">
+      <div class="flag-mark" aria-label="trans pride flag">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="eyebrow">Main theme: trans</div>
+      <h1>not a pastel habit app.</h1>
+      <p>Phase 1 visual direction for a local-only HRT medication tracker. The flag is not hidden in accents; it becomes the product chrome, dose card, navigation language, and setup rhythm.</p>
+      <div class="palette" aria-label="Official trans flag colors">
+        <div class="swatch blue">#5BCEFA</div>
+        <div class="swatch white">#FFFFFF</div>
+        <div class="swatch pink">#F5A9B8</div>
+      </div>
+    </aside>
+
+    <section class="phone" aria-label="Android phone mockup">
+      <div class="screen" id="screen" data-view="home">
+        <div class="toast" id="toast">Dose marked taken · next at 09:00</div>
+        <div class="screen-grid home-screen">
+          <div class="status"><span>20:42</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="topbar">
+            <div class="title-stack"><b>Today</b><span>local-only HRT tracker</span></div>
+            <button class="round-btn" data-view-button="setup" aria-label="Open setup">✦</button>
+          </div>
+
+          <section class="hero-dose" aria-label="Next dose">
+            <div class="dose-panel">
+              <div class="dose-row">
+                <div>
+                  <div class="dose-label">next dose</div>
+                  <div class="dose-time">21:00</div>
+                </div>
+                <div class="spark" aria-hidden="true"></div>
+              </div>
+              <div class="dose-med">Estradiol · 2 mg</div>
+              <div class="dose-meta">sublingual · every 12 hours · reminder on</div>
+              <button class="primary" id="markTaken">Mark dose taken</button>
+            </div>
+          </section>
+
+          <section class="flag-card">
+            <div class="card-head"><b>Active routine</b><div class="mini-flag"></div></div>
+            <div class="routine">
+              <div><strong>Estradiol</strong><br><span>09:00 · 21:00</span></div>
+              <div class="pill">2× daily</div>
+              <div><strong>Cyproterone</strong><br><span>Friday · 21:00</span></div>
+              <div class="pill">optional</div>
+            </div>
+          </section>
+
+          <section class="flag-card">
+            <div class="card-head"><b>Next 24 hours</b><button data-view-button="timeline">View all</button></div>
+            <div class="timeline">
+              <div class="event"><time>21:00</time><div><b>Estradiol</b><span>take now window</span></div><i class="badge"></i></div>
+              <div class="event"><time>09:00</time><div><b>Estradiol</b><span>tomorrow morning</span></div><i class="badge pink"></i></div>
+              <div class="event"><time>Fri</time><div><b>Blocker</b><span>optional reminder</span></div><i class="badge white"></i></div>
+            </div>
+          </section>
+
+          <nav class="nav" aria-label="Bottom navigation">
+            <button class="active" data-view-button="home">Today</button>
+            <button data-view-button="timeline">Routine</button>
+            <button>History</button>
+            <button data-view-button="setup">Setup</button>
+          </nav>
+        </div>
+
+        <div class="screen-grid setup-screen">
+          <div class="status"><span>20:42</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="topbar"><button class="round-btn" data-view-button="home">←</button><div class="mini-flag"></div></div>
+          <h2 class="setup-title">build your routine.</h2>
+          <section class="flag-card input-card"><label>medication</label><div>Estradiol</div></section>
+          <section class="flag-card input-card"><label>dose</label><div>2 mg · sublingual</div></section>
+          <section class="flag-card input-card"><label>interval</label><div>every 12 hours</div></section>
+          <section class="flag-card input-card"><label>privacy</label><div>local only · no account</div></section>
+          <button class="primary" data-view-button="home">Save local routine</button>
+        </div>
+
+        <div class="screen-grid timeline-screen">
+          <div class="status"><span>20:42</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="topbar"><button class="round-btn" data-view-button="home">←</button><div class="title-stack"><b>Routine</b><span>fixed-anchor schedule</span></div></div>
+          <section class="flag-card">
+            <div class="card-head"><b>This week</b><div class="mini-flag"></div></div>
+            <div class="timeline">
+              <div class="event"><time>Mon</time><div><b>09:00 · 21:00</b><span>Estradiol reminders</span></div><i class="badge"></i></div>
+              <div class="event"><time>Tue</time><div><b>09:00 · 21:00</b><span>Estradiol reminders</span></div><i class="badge pink"></i></div>
+              <div class="event"><time>Fri</time><div><b>21:00</b><span>Blocker reminder if enabled</span></div><i class="badge white"></i></div>
+            </div>
+          </section>
+          <section class="flag-card input-card"><label>reminder behavior</label><div>gentle notification · no streak pressure</div></section>
+          <nav class="nav" aria-label="Bottom navigation"><button data-view-button="home">Today</button><button class="active">Routine</button><button>History</button><button data-view-button="setup">Setup</button></nav>
+        </div>
+      </div>
+    </section>
+
+    <aside class="tweaks" aria-label="Prototype controls">
+      <div class="eyebrow">Prototype controls</div>
+      <h1 style="font-size:38px;max-width:9ch;margin-bottom:12px">less generic, more product.</h1>
+      <p>Use the controls to inspect the Phase 1 surfaces. The design keeps medication actions legible while making the trans flag the actual interface structure.</p>
+      <div class="option-grid">
+        <button class="option active" data-view-button="home"><b>Today</b><span>primary dose action</span></button>
+        <button class="option" data-view-button="setup"><b>Setup</b><span>local routine creation</span></button>
+        <button class="option" data-view-button="timeline"><b>Routine</b><span>weekly schedule view</span></button>
+      </div>
+      <div class="theme-toggle">
+        <button class="active" id="lightBtn">Light</button>
+        <button id="darkBtn">Dark</button>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const body = document.body;
+    const screen = document.getElementById('screen');
+    const lightBtn = document.getElementById('lightBtn');
+    const darkBtn = document.getElementById('darkBtn');
+    const toast = document.getElementById('toast');
+    const markTaken = document.getElementById('markTaken');
+
+    function setTheme(theme) {
+      body.dataset.theme = theme;
+      lightBtn.classList.toggle('active', theme === 'light');
+      darkBtn.classList.toggle('active', theme === 'dark');
+      localStorage.setItem('hrt-design-theme', theme);
+    }
+    function setView(view) {
+      screen.dataset.view = view;
+      document.querySelectorAll('[data-view-button]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.viewButton === view && btn.classList.contains('option'));
+      });
+    }
+    document.querySelectorAll('[data-view-button]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.viewButton)));
+    lightBtn.addEventListener('click', () => setTheme('light'));
+    darkBtn.addEventListener('click', () => setTheme('dark'));
+    markTaken.addEventListener('click', () => {
+      markTaken.textContent = 'Taken · next at 09:00';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    });
+    setTheme(localStorage.getItem('hrt-design-theme') || 'light');
+  </script>
+</body>
+</html>
