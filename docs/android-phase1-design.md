@@ -26,7 +26,9 @@ The app should feel:
 - not clinical
 - not childish
 
-The palette should be based on the transgender pride flag colors: soft blue, soft pink, and white. The colors should be used with restraint so the app feels identity-aware, calm, and trustworthy rather than loud or novelty-themed.
+The palette should use the transgender pride flag as the main theme, not merely a subtle accent. Use the commonly listed flag colors from Wikipedia: light blue `#5BCEFA`, pink `#F5A9B8`, and white `#FFFFFF`. The UI should show recognizable flag bands/ribbons in key surfaces while preserving health-tracker readability and avoiding guilt/gamified language.
+
+The earlier subtle trans-palette revision is preserved separately at `sketches/android/005-subtle-trans-palette/`.
 
 The app should not feel like a generic habit game. It is a sensitive medication tracker, so the design should avoid streak pressure, guilt language, or gamified punishment.
 
@@ -123,10 +125,11 @@ For Phase 1, History may be minimal or read-only. It can show taken dose events 
 
 ### Colors
 
-- Palette basis: transgender pride flag colors — blue `#5BCEFA`, pink `#F5A9B8`, and white `#FFFFFF`
-- Background: pale trans-blue/white wash in light mode; near-black blue-charcoal in dark mode
+- Palette basis: transgender pride flag colors from Wikipedia/common references — light blue `#5BCEFA`, pink `#F5A9B8`, and white `#FFFFFF`
+- Background: visibly blue/pink/white in light mode; blue-charcoal in dark mode with clear blue/pink glow
 - Surface: white cards in light mode; elevated blue-charcoal cards in dark mode
-- Accent: accessibility-adjusted trans blue for primary controls
+- Hero: recognizable trans-flag stripe pattern, with text/control contrast protected
+- Accent: accessibility-adjusted trans blue for primary controls and active states
 - Secondary accent: trans pink for pills, notes, and warm highlights
 - Success/reminder: teal-blue derived from the trans-blue family
 - Warning/attention: muted pink rather than harsh red/orange
