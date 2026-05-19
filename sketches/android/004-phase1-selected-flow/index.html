@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HRT Pill Tracker — Android Phase 1 Design</title>
+  <style>
+    :root {
+      --bg: #f6f2ee;
+      --surface: #fffaf6;
+      --surface-2: #f0e7df;
+      --ink: #211b18;
+      --muted: #70655f;
+      --line: #e6d8ce;
+      --accent: #8f5bff;
+      --accent-ink: #ffffff;
+      --accent-soft: #eee6ff;
+      --ok: #167a57;
+      --ok-soft: #e5f5ee;
+      --warn: #9a5d00;
+      --warn-soft: #fff3d8;
+      --shadow: 0 24px 60px rgba(55, 39, 28, 0.18);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(143, 91, 255, 0.18), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(22, 122, 87, 0.12), transparent 26%),
+        var(--bg);
+      display: flex;
+      justify-content: center;
+      padding: 28px 16px;
+    }
+
+    .board {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel, .phone {
+      background: rgba(255, 250, 246, 0.88);
+      border: 1px solid rgba(230, 216, 206, 0.85);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel {
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      position: sticky;
+      top: 24px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 760;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+    }
+
+    h1 { margin: 8px 0 10px; font-size: 30px; line-height: 1.05; letter-spacing: -0.04em; }
+    .lead { margin: 0 0 20px; color: var(--muted); line-height: 1.55; }
+
+    .nav { display: grid; gap: 10px; margin-top: 20px; }
+    .nav button {
+      border: 1px solid var(--line);
+      background: #fffdfb;
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 14px 14px;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+    .nav button strong { display: block; font-size: 14px; }
+    .nav button span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .nav button.active, .nav button:hover {
+      border-color: rgba(143, 91, 255, 0.45);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .notes {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 18px;
+      background: #fff6df;
+      color: #6f4a05;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(280px, 390px);
+      gap: 22px;
+      justify-content: center;
+    }
+
+    .phone {
+      border-radius: 42px;
+      padding: 12px;
+      max-width: 390px;
+    }
+    .screen {
+      min-height: 760px;
+      border-radius: 32px;
+      overflow: hidden;
+      background: #fbf7f3;
+      border: 1px solid rgba(31, 24, 19, 0.08);
+      position: relative;
+      display: none;
+    }
+    .screen.active { display: block; }
+
+    .statusbar {
+      height: 38px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 22px;
+      font-size: 12px;
+      color: #3b332e;
+      font-weight: 650;
+    }
+    .appbar { padding: 12px 22px 6px; display: flex; align-items: center; justify-content: space-between; }
+    .appbar h2 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
+    .icon-btn { border: 0; background: #efe6dd; width: 38px; height: 38px; border-radius: 14px; font-size: 17px; cursor: pointer; }
+    .content { padding: 12px 20px 96px; }
+
+    .local-chip {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--ok-soft);
+      color: var(--ok);
+      font-weight: 720;
+      font-size: 12px;
+    }
+
+    .hero {
+      margin-top: 16px;
+      padding: 22px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, #2d223b, #6f45d8);
+      color: white;
+      box-shadow: 0 18px 42px rgba(88, 54, 178, 0.35);
+    }
+    .hero .label { opacity: 0.72; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; }
+    .hero .time { margin-top: 8px; font-size: 42px; font-weight: 820; letter-spacing: -0.06em; }
+    .hero .med { margin-top: 4px; font-size: 18px; font-weight: 760; }
+    .hero .meta { margin-top: 8px; color: rgba(255,255,255,.76); font-size: 13px; }
+    .primary {
+      margin-top: 18px;
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 16px;
+      background: white;
+      color: #4a29a6;
+      font-weight: 820;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .section-title { margin: 24px 2px 10px; display:flex; justify-content:space-between; align-items:center; }
+    .section-title h3 { margin:0; font-size: 15px; letter-spacing: -0.02em; }
+    .section-title a { color: var(--accent); font-size: 12px; text-decoration: none; font-weight: 760; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .med-row { display:flex; gap:12px; align-items:center; }
+    .dot { width: 42px; height: 42px; border-radius: 16px; display:grid; place-items:center; font-weight: 850; }
+    .dot.purple { background: var(--accent-soft); color: var(--accent); }
+    .dot.green { background: var(--ok-soft); color: var(--ok); }
+    .dot.gray { background: #eee8e3; color: #796e66; }
+    .med-row strong { display:block; font-size:15px; }
+    .med-row small { display:block; color: var(--muted); margin-top:3px; }
+    .pill { margin-left:auto; padding: 7px 9px; border-radius: 999px; font-size: 11px; font-weight: 760; background:#f1ece7; color:#675b53; }
+
+    .bottom-nav {
+      position: absolute;
+      left: 16px; right: 16px; bottom: 16px;
+      height: 68px;
+      background: rgba(255,250,246,.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      box-shadow: 0 14px 34px rgba(58,42,30,.12);
+    }
+    .bottom-nav div { color: var(--muted); font-size: 11px; text-align:center; font-weight:700; }
+    .bottom-nav .on { color: var(--accent); }
+
+    .setup-card { margin-top: 18px; padding: 18px; border-radius: 24px; background: #fffdfb; border: 1px solid var(--line); }
+    .field { margin-top: 14px; }
+    .field label { display:block; font-size:12px; font-weight:760; color:var(--muted); margin-bottom:7px; }
+    .input { width:100%; padding: 14px; border:1px solid var(--line); border-radius:16px; background:#fbf7f3; color:var(--ink); font:inherit; }
+    .choice { display:flex; gap:10px; margin-top:10px; }
+    .choice button { flex:1; border:1px solid var(--line); border-radius:16px; padding:12px 8px; background:white; font-weight:760; cursor:pointer; }
+    .choice button.selected { border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+    .full-primary { width:100%; margin-top:18px; background:var(--accent); color:white; border:0; border-radius:18px; padding:15px; font-weight:820; font-size:15px; cursor:pointer; }
+
+    .timeline { margin-top: 10px; position: relative; }
+    .timeline::before { content:""; position:absolute; left:20px; top:10px; bottom:10px; width:2px; background:var(--line); }
+    .event { position:relative; display:grid; grid-template-columns:48px 1fr; gap:8px; margin: 12px 0; }
+    .event .marker { width:40px; height:40px; border-radius:15px; background:#fff; border:1px solid var(--line); display:grid; place-items:center; z-index:1; font-weight:850; }
+    .event.done .marker { background:var(--ok-soft); color:var(--ok); border-color:#c9eadc; }
+    .event.next .marker { background:var(--accent); color:white; border-color:var(--accent); }
+    .event-card { background:#fffdfb; border:1px solid var(--line); border-radius:18px; padding:13px; }
+    .event-card strong { display:block; font-size:14px; }
+    .event-card small { color:var(--muted); }
+
+    .toast {
+      position:absolute;
+      left: 24px; right: 24px; bottom: 98px;
+      background:#211b18;
+      color:white;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 13px;
+      opacity:0;
+      transform: translateY(10px);
+      transition: 180ms ease;
+      pointer-events:none;
+    }
+    .toast.show { opacity:1; transform: translateY(0); }
+
+    @media (max-width: 920px) {
+      .board { grid-template-columns: 1fr; }
+      .panel { position: static; }
+      .stage { grid-template-columns: 1fr; }
+      .phone { margin: 0 auto; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <aside class="panel">
+      <div class="eyebrow">Selected Android direction</div>
+      <h1>Calm Cards + guided setup</h1>
+      <p class="lead">Phase 1 için önerilen tasarım: sakin, lokal/veri gizliliği net, ana aksiyon tek dokunuşla “aldım”. T-blocker opsiyonel; estrogen-only akış doğal.</p>
+      <div class="nav">
+        <button class="active" data-screen="home"><strong>Home</strong><span>Next dose, mark taken, today cards</span></button>
+        <button data-screen="setup"><strong>Setup</strong><span>Local-only first treatment setup</span></button>
+        <button data-screen="schedule"><strong>Schedule</strong><span>Timeline and optional medication state</span></button>
+        <button data-screen="settings"><strong>Settings</strong><span>Local reminders and future sync placeholder</span></button>
+      </div>
+      <div class="notes">Bu bir HTML design mockup; Android Phase 1 uygulama kodu değil. Buradan sonra onay verirsen native Compose implementation’a geçilecek.</div>
+    </aside>
+
+    <section class="stage">
+      <div class="phone">
+        <section class="screen active" id="home">
+          <div class="statusbar"><span>09:41</span><span>●●● 82%</span></div>
+          <div class="appbar"><h2>Today</h2><button class="icon-btn">⚙</button></div>
+          <div class="content">
+            <span class="local-chip">● Local only</span>
+            <div class="hero">
+              <div class="label">Next dose</div>
+              <div class="time">21:00</div>
+              <div class="med">Estradiol · 2 mg</div>
+              <div class="meta">Sublingual · every 12 hours · reminder on</div>
+              <button class="primary" onclick="markTaken(this)">Mark dose taken</button>
+            </div>
+            <div class="section-title"><h3>Active routine</h3><a href="#">Edit</a></div>
+            <div class="card med-row">
+              <div class="dot purple">E</div><div><strong>Estradiol</strong><small>2 mg · sublingual · every 12h</small></div><span class="pill">Due 21:00</span>
+            </div>
+            <div class="card med-row">
+              <div class="dot green">T</div><div><strong>T-blocker</strong><small>12.5 mg · 1/4 tablet · every 48h</small></div><span class="pill">Tomorrow</span>
+            </div>
+            <div class="section-title"><h3>Reminder status</h3><a href="#">Manage</a></div>
+            <div class="card med-row">
+              <div class="dot gray">🔔</div><div><strong>Local notifications active</strong><small>No account needed on this device</small></div>
+            </div>
+          </div>
+          <div class="toast" id="toast">Dose marked as taken. Next dose updated.</div>
+          <nav class="bottom-nav"><div class="on">⌂<br>Today</div><div>↻<br>Routine</div><div>◷<br>History</div><div>⚙<br>Settings</div></nav>
+        </section>
+
+        <section class="screen" id="setup">
+          <div class="statusbar"><span>09:41</span><span>●●● 82%</span></div>
+          <div class="appbar"><h2>Set up routine</h2><button class="icon-btn">?</button></div>
+          <div class="content">
+            <span class="local-chip">● Stored on this device</span>
+            <div class="setup-card">
+              <div class="eyebrow">Step 1</div>
+              <h2 style="margin:8px 0 4px; font-size:24px; letter-spacing:-.04em;">Add estrogen</h2>
+              <p class="lead" style="margin-bottom:0;">Use your own prescribed or chosen regimen. The app only tracks what you enter.</p>
+              <div class="field"><label>Medication name</label><input class="input" value="Estradiol" /></div>
+              <div class="field"><label>Dose</label><input class="input" value="2 mg" /></div>
+              <div class="field"><label>Route</label><div class="choice"><button>Oral</button><button class="selected">Sublingual</button></div></div>
+              <div class="field"><label>Interval</label><div class="choice"><button>12h</button><button>8h</button><button>6h</button><button>Custom</button></div></div>
+              <button class="full-primary" onclick="completeSetup(this)">Continue</button>
+            </div>
+            <div class="card med-row" style="margin-top:14px;"><div class="dot gray">＋</div><div><strong>T-blocker is optional</strong><small>Skip for estrogen-only routines or add later.</small></div></div>
+          </div>
+          <nav class="bottom-nav"><div class="on">1<br>Setup</div><div>2<br>Routine</div><div>3<br>Done</div></nav>
+        </section>
+
+        <section class="screen" id="schedule">
+          <div class="statusbar"><span>09:41</span><span>●●● 82%</span></div>
+          <div class="appbar"><h2>Routine</h2><button class="icon-btn">＋</button></div>
+          <div class="content">
+            <span class="local-chip">● Fixed-anchor schedule</span>
+            <div class="section-title"><h3>Today timeline</h3><a href="#">Calendar</a></div>
+            <div class="timeline">
+              <div class="event done"><div class="marker">✓</div><div class="event-card"><strong>09:00 · Estradiol</strong><small>Taken at 09:04 · 2 mg sublingual</small></div></div>
+              <div class="event next"><div class="marker">E</div><div class="event-card"><strong>21:00 · Estradiol</strong><small>Next dose · reminder enabled</small></div></div>
+              <div class="event"><div class="marker">T</div><div class="event-card"><strong>Tomorrow · T-blocker</strong><small>12.5 mg · 1/4 tablet · optional med</small></div></div>
+            </div>
+            <div class="section-title"><h3>Medication cards</h3><a href="#">Add</a></div>
+            <div class="card med-row"><div class="dot purple">E</div><div><strong>Estradiol</strong><small>Every 12h · 2 doses today</small></div><span class="pill">Active</span></div>
+            <div class="card med-row"><div class="dot green">T</div><div><strong>T-blocker</strong><small>Every 48h · can be disabled</small></div><span class="pill">Optional</span></div>
+          </div>
+          <nav class="bottom-nav"><div>⌂<br>Today</div><div class="on">↻<br>Routine</div><div>◷<br>History</div><div>⚙<br>Settings</div></nav>
+        </section>
+
+        <section class="screen" id="settings">
+          <div class="statusbar"><span>09:41</span><span>●●● 82%</span></div>
+          <div class="appbar"><h2>Settings</h2><button class="icon-btn">✓</button></div>
+          <div class="content">
+            <div class="card med-row"><div class="dot green">🔒</div><div><strong>Local-only mode</strong><small>Everything works without an account.</small></div><span class="pill">On</span></div>
+            <div class="card med-row"><div class="dot purple">🔔</div><div><strong>Local reminders</strong><small>Notifications are scheduled on this phone.</small></div><span class="pill">On</span></div>
+            <div class="card med-row"><div class="dot gray">☁</div><div><strong>Backup & sync</strong><small>Future: optional Google account backup.</small></div><span class="pill">Phase 2</span></div>
+            <div class="card med-row"><div class="dot gray">♡</div><div><strong>Support the project</strong><small>Future: donation and optional ads.</small></div><span class="pill">Phase 3</span></div>
+            <div class="notes" style="margin-top:18px;">Medical disclaimer is visible during onboarding and in settings, but not repeated aggressively on every screen.</div>
+          </div>
+          <nav class="bottom-nav"><div>⌂<br>Today</div><div>↻<br>Routine</div><div>◷<br>History</div><div class="on">⚙<br>Settings</div></nav>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const buttons = document.querySelectorAll('.nav button');
+    const screens = document.querySelectorAll('.screen');
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const id = btn.dataset.screen;
+      screens.forEach(s => s.classList.toggle('active', s.id === id));
+    }));
+    function markTaken(button) {
+      button.textContent = 'Taken ✓';
+      button.disabled = true;
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+    function completeSetup(button) {
+      button.textContent = 'Saved locally ✓';
+      setTimeout(() => {
+        document.querySelector('[data-screen="home"]').click();
+      }, 600);
+    }
+  </script>
+</body>
+</html>

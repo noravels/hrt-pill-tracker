@@ -9,6 +9,7 @@ Three disposable HTML mockups explore Android phase 1 directions for the HRT pil
 | [001 Calm Cards](001-calm-cards/) | Spacious home screen centered on the next dose | Most reassuring; clearest primary action; strong local-only messaging | Less dense; schedule details require more vertical space |
 | [002 Compact Schedule](002-compact-schedule/) | Schedule-first utility UI with tabs and list rows | Fast scanning; most Material-like; efficient use of space | Feels more operational and less emotionally warm |
 | [003 Routine Timeline](003-routine-timeline/) | Chronological routine view with expandable reminder sheet | Best sense of daily progress; optional meds are naturally represented | More custom; timeline may be heavier to implement cleanly |
+| [004 Phase 1 Selected Flow](004-phase1-selected-flow/) | Consolidated proposed Phase 1 design with Home, Setup, Routine, Settings | Best implementation handoff; combines calm cards with guided setup and timeline | Less exploratory; assumes the 001 direction as baseline |
 
 ## Shared requirements covered
 
@@ -24,6 +25,6 @@ Three disposable HTML mockups explore Android phase 1 directions for the HRT pil
 
 ## Recommendation
 
-Use 001 Calm Cards as the baseline for phase 1. It best matches the medical/sensitive product tone: calm, trustworthy, low-pressure, and focused on the next safe action. It also communicates local-only privacy clearly without making the app feel like a settings screen.
+Use 004 Phase 1 Selected Flow as the Android implementation handoff. It consolidates the recommended 001 Calm Cards direction into a concrete Phase 1 flow: Home, Setup, Routine, and Settings.
 
-Borrow selectively from 002 Compact Schedule for the schedule list and reminder tab if users ask for denser daily planning. Borrow from 003 Routine Timeline if the app later needs a more habit/routine-oriented daily progress view.
+001 Calm Cards remains the baseline visual language. Borrow selectively from 002 Compact Schedule for the schedule list and reminder tab if users ask for denser daily planning. Borrow from 003 Routine Timeline if the app later needs a more habit/routine-oriented daily progress view.
