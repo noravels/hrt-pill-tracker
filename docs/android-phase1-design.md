@@ -121,13 +121,13 @@ For Phase 1, History may be minimal or read-only. It can show taken dose events 
 
 ### Colors
 
-- Background: warm off-white / beige
-- Surface: near-white cards
+- Background: warm off-white / beige in light mode; near-black warm charcoal in dark mode
+- Surface: near-white cards in light mode; elevated warm charcoal cards in dark mode
 - Accent: soft purple
 - Success: muted green
 - Warning: warm amber
-- Text: dark warm brown/black
-- Dividers: light warm gray
+- Text: dark warm brown/black in light mode; warm off-white in dark mode
+- Dividers: light warm gray in light mode; low-contrast warm gray in dark mode
 
 ### Shape
 
@@ -139,6 +139,7 @@ For Phase 1, History may be minimal or read-only. It can show taken dose events 
 ### Typography
 
 - Android native Material typography is fine.
+- Support light and dark mode from Phase 1; dark mode should be calm charcoal, not pure black.
 - Emphasize large next-dose time.
 - Use concise labels and avoid medical advice wording.
 

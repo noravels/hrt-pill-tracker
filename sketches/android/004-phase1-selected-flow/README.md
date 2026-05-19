@@ -12,7 +12,7 @@ This is the proposed Android Phase 1 direction: calm card-based home screen, gui
 - Privacy: local-only mode is visible but not alarmist.
 - Optionality: T-blocker is represented as optional, so estrogen-only routines do not look like an error.
 - Future phases: settings includes Phase 2 backup/sync and Phase 3 support/revenue placeholders without implementing them.
-- Interaction: side panel switches screens; “Mark dose taken” shows a toast and updates button state; setup save returns to home.
+- Interaction: side panel switches screens; “Mark dose taken” shows a toast and updates button state; setup save returns to home; Light/Dark toggle previews both themes.
 
 ## Trade-offs
 

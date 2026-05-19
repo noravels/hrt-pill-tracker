@@ -19,11 +19,71 @@
       --ok-soft: #e5f5ee;
       --warn: #9a5d00;
       --warn-soft: #fff3d8;
+      --panel-bg: rgba(255, 250, 246, 0.88);
+      --panel-border: rgba(230, 216, 206, 0.85);
+      --nav-bg: #fffdfb;
+      --screen-bg: #fbf7f3;
+      --screen-border: rgba(31, 24, 19, 0.08);
+      --status-ink: #3b332e;
+      --button-soft: #efe6dd;
+      --gray-soft: #eee8e3;
+      --gray-ink: #796e66;
+      --pill-bg: #f1ece7;
+      --pill-ink: #675b53;
+      --bottom-bg: rgba(255,250,246,.92);
+      --input-bg: #fbf7f3;
+      --note-bg: #fff6df;
+      --note-ink: #6f4a05;
+      --event-bg: #fffdfb;
+      --marker-bg: #ffffff;
+      --toast-bg: #211b18;
+      --toast-ink: #ffffff;
+      --primary-ink: #4a29a6;
+      --hero-bg: linear-gradient(145deg, #2d223b, #6f45d8);
+      --hero-shadow: 0 18px 42px rgba(88, 54, 178, 0.35);
       --shadow: 0 24px 60px rgba(55, 39, 28, 0.18);
       --radius-xl: 30px;
       --radius-lg: 22px;
       --radius-md: 16px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #11100f;
+      --surface: #1d1a18;
+      --surface-2: #26211f;
+      --ink: #f8eee7;
+      --muted: #cabcaf;
+      --line: #3a322d;
+      --accent: #b79aff;
+      --accent-soft: #302447;
+      --ok: #72d6ad;
+      --ok-soft: #173529;
+      --warn: #f4bf64;
+      --warn-soft: #3d2b10;
+      --panel-bg: rgba(29, 26, 24, 0.9);
+      --panel-border: rgba(67, 56, 49, 0.9);
+      --nav-bg: #211d1a;
+      --screen-bg: #171514;
+      --screen-border: rgba(255, 245, 238, 0.08);
+      --status-ink: #e7d9cf;
+      --button-soft: #2b2521;
+      --gray-soft: #2b2724;
+      --gray-ink: #c7b8ae;
+      --pill-bg: #29231f;
+      --pill-ink: #dacdc3;
+      --bottom-bg: rgba(29, 26, 24, .94);
+      --input-bg: #161312;
+      --note-bg: #372814;
+      --note-ink: #f1ca82;
+      --event-bg: #211d1a;
+      --marker-bg: #211d1a;
+      --toast-bg: #f8eee7;
+      --toast-ink: #171514;
+      --primary-ink: #f4ecff;
+      --hero-bg: linear-gradient(145deg, #17111f, #6e4bdd);
+      --hero-shadow: 0 18px 42px rgba(95, 72, 180, 0.30);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
     }
 
     * { box-sizing: border-box; }
@@ -49,8 +109,8 @@
     }
 
     .panel, .phone {
-      background: rgba(255, 250, 246, 0.88);
-      border: 1px solid rgba(230, 216, 206, 0.85);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
     }
@@ -76,7 +136,7 @@
     .nav { display: grid; gap: 10px; margin-top: 20px; }
     .nav button {
       border: 1px solid var(--line);
-      background: #fffdfb;
+      background: var(--nav-bg);
       color: var(--ink);
       border-radius: 16px;
       padding: 14px 14px;
@@ -97,8 +157,8 @@
       margin-top: 20px;
       padding: 16px;
       border-radius: 18px;
-      background: #fff6df;
-      color: #6f4a05;
+      background: var(--note-bg);
+      color: var(--note-ink);
       font-size: 13px;
       line-height: 1.45;
     }
@@ -119,8 +179,8 @@
       min-height: 760px;
       border-radius: 32px;
       overflow: hidden;
-      background: #fbf7f3;
-      border: 1px solid rgba(31, 24, 19, 0.08);
+      background: var(--screen-bg);
+      border: 1px solid var(--screen-border);
       position: relative;
       display: none;
     }
@@ -133,12 +193,12 @@
       align-items: center;
       padding: 0 22px;
       font-size: 12px;
-      color: #3b332e;
+      color: var(--status-ink);
       font-weight: 650;
     }
     .appbar { padding: 12px 22px 6px; display: flex; align-items: center; justify-content: space-between; }
     .appbar h2 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
-    .icon-btn { border: 0; background: #efe6dd; width: 38px; height: 38px; border-radius: 14px; font-size: 17px; cursor: pointer; }
+    .icon-btn { border: 0; background: var(--button-soft); color: var(--ink); width: 38px; height: 38px; border-radius: 14px; font-size: 17px; cursor: pointer; }
     .content { padding: 12px 20px 96px; }
 
     .local-chip {
@@ -157,9 +217,9 @@
       margin-top: 16px;
       padding: 22px;
       border-radius: 28px;
-      background: linear-gradient(145deg, #2d223b, #6f45d8);
+      background: var(--hero-bg);
       color: white;
-      box-shadow: 0 18px 42px rgba(88, 54, 178, 0.35);
+      box-shadow: var(--hero-shadow);
     }
     .hero .label { opacity: 0.72; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; }
     .hero .time { margin-top: 8px; font-size: 42px; font-weight: 820; letter-spacing: -0.06em; }
@@ -171,8 +231,8 @@
       border: 0;
       border-radius: 18px;
       padding: 15px 16px;
-      background: white;
-      color: #4a29a6;
+      background: var(--nav-bg);
+      color: var(--primary-ink);
       font-weight: 820;
       font-size: 15px;
       cursor: pointer;
@@ -193,16 +253,16 @@
     .dot { width: 42px; height: 42px; border-radius: 16px; display:grid; place-items:center; font-weight: 850; }
     .dot.purple { background: var(--accent-soft); color: var(--accent); }
     .dot.green { background: var(--ok-soft); color: var(--ok); }
-    .dot.gray { background: #eee8e3; color: #796e66; }
+    .dot.gray { background: var(--gray-soft); color: var(--gray-ink); }
     .med-row strong { display:block; font-size:15px; }
     .med-row small { display:block; color: var(--muted); margin-top:3px; }
-    .pill { margin-left:auto; padding: 7px 9px; border-radius: 999px; font-size: 11px; font-weight: 760; background:#f1ece7; color:#675b53; }
+    .pill { margin-left:auto; padding: 7px 9px; border-radius: 999px; font-size: 11px; font-weight: 760; background:var(--pill-bg); color:var(--pill-ink); }
 
     .bottom-nav {
       position: absolute;
       left: 16px; right: 16px; bottom: 16px;
       height: 68px;
-      background: rgba(255,250,246,.92);
+      background: var(--bottom-bg);
       border: 1px solid var(--line);
       border-radius: 24px;
       display:flex;
@@ -213,30 +273,30 @@
     .bottom-nav div { color: var(--muted); font-size: 11px; text-align:center; font-weight:700; }
     .bottom-nav .on { color: var(--accent); }
 
-    .setup-card { margin-top: 18px; padding: 18px; border-radius: 24px; background: #fffdfb; border: 1px solid var(--line); }
+    .setup-card { margin-top: 18px; padding: 18px; border-radius: 24px; background: var(--nav-bg); border: 1px solid var(--line); }
     .field { margin-top: 14px; }
     .field label { display:block; font-size:12px; font-weight:760; color:var(--muted); margin-bottom:7px; }
-    .input { width:100%; padding: 14px; border:1px solid var(--line); border-radius:16px; background:#fbf7f3; color:var(--ink); font:inherit; }
+    .input { width:100%; padding: 14px; border:1px solid var(--line); border-radius:16px; background:var(--input-bg); color:var(--ink); font:inherit; }
     .choice { display:flex; gap:10px; margin-top:10px; }
-    .choice button { flex:1; border:1px solid var(--line); border-radius:16px; padding:12px 8px; background:white; font-weight:760; cursor:pointer; }
+    .choice button { flex:1; border:1px solid var(--line); border-radius:16px; padding:12px 8px; background:var(--nav-bg); color:var(--ink); font-weight:760; cursor:pointer; }
     .choice button.selected { border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
     .full-primary { width:100%; margin-top:18px; background:var(--accent); color:white; border:0; border-radius:18px; padding:15px; font-weight:820; font-size:15px; cursor:pointer; }
 
     .timeline { margin-top: 10px; position: relative; }
     .timeline::before { content:""; position:absolute; left:20px; top:10px; bottom:10px; width:2px; background:var(--line); }
     .event { position:relative; display:grid; grid-template-columns:48px 1fr; gap:8px; margin: 12px 0; }
-    .event .marker { width:40px; height:40px; border-radius:15px; background:#fff; border:1px solid var(--line); display:grid; place-items:center; z-index:1; font-weight:850; }
+    .event .marker { width:40px; height:40px; border-radius:15px; background:var(--marker-bg); border:1px solid var(--line); display:grid; place-items:center; z-index:1; font-weight:850; }
     .event.done .marker { background:var(--ok-soft); color:var(--ok); border-color:#c9eadc; }
     .event.next .marker { background:var(--accent); color:white; border-color:var(--accent); }
-    .event-card { background:#fffdfb; border:1px solid var(--line); border-radius:18px; padding:13px; }
+    .event-card { background:var(--event-bg); border:1px solid var(--line); border-radius:18px; padding:13px; }
     .event-card strong { display:block; font-size:14px; }
     .event-card small { color:var(--muted); }
 
     .toast {
       position:absolute;
       left: 24px; right: 24px; bottom: 98px;
-      background:#211b18;
-      color:white;
+      background:var(--toast-bg);
+      color:var(--toast-ink);
       border-radius: 18px;
       padding: 14px 16px;
       font-size: 13px;
@@ -246,6 +306,30 @@
       pointer-events:none;
     }
     .toast.show { opacity:1; transform: translateY(0); }
+
+    .theme-switch {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 999px;
+    }
+    .theme-switch button {
+      flex: 1;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 12px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .theme-switch button.active {
+      background: var(--accent);
+      color: white;
+    }
 
     @media (max-width: 920px) {
       .board { grid-template-columns: 1fr; }
@@ -261,6 +345,10 @@
       <div class="eyebrow">Selected Android direction</div>
       <h1>Calm Cards + guided setup</h1>
       <p class="lead">Phase 1 için önerilen tasarım: sakin, lokal/veri gizliliği net, ana aksiyon tek dokunuşla “aldım”. T-blocker opsiyonel; estrogen-only akış doğal.</p>
+      <div class="theme-switch" aria-label="Theme preview">
+        <button class="active" data-theme-choice="light">Light</button>
+        <button data-theme-choice="dark">Dark</button>
+      </div>
       <div class="nav">
         <button class="active" data-screen="home"><strong>Home</strong><span>Next dose, mark taken, today cards</span></button>
         <button data-screen="setup"><strong>Setup</strong><span>Local-only first treatment setup</span></button>
@@ -356,6 +444,12 @@
   <script>
     const buttons = document.querySelectorAll('.nav button');
     const screens = document.querySelectorAll('.screen');
+    const themeButtons = document.querySelectorAll('[data-theme-choice]');
+    themeButtons.forEach(btn => btn.addEventListener('click', () => {
+      const theme = btn.dataset.themeChoice;
+      document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light';
+      themeButtons.forEach(b => b.classList.toggle('active', b === btn));
+    }));
     buttons.forEach(btn => btn.addEventListener('click', () => {
       buttons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
